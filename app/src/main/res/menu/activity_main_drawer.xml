@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_webview"
+            android:title="浏览器" />
+
+        <item
+            android:id="@+id/nav_camera"
+            android:checkable="false"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="扫一扫" />
+
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="网络工具" />
+
+        <item
+            android:id="@+id/nav_manage"
+            android:checkable="false"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="设置" />
+
+        <item
+            android:checkable="true"
+            android:title="高级功能">
+            <menu>
+                <item
+                    android:id="@+id/nav_ua"
+                    android:icon="@drawable/ic_style_black_24dp"
+                    android:title="环境切换" />
+                <item
+                    android:id="@+id/nav_cosole"
+                    android:icon="@drawable/ic_assignment_black_24dp"
+                    android:title="查看Console.log" />
+                <item
+                    android:id="@+id/nav_host"
+                    android:icon="@drawable/ic_dns_black_24dp"
+                    android:title="HOST配置" />
+                <item
+                    android:id="@+id/nav_page"
+                    android:icon="@drawable/ic_note_add_black_24dp"
+                    android:title="手动分页" />
+            </menu>
+        </item>
+    </group>
+
+</menu>

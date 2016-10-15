@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--带清除按钮的EditText-->
+    <declare-styleable name="EditTextField">
+        <!-- 清除按钮显示模式 -->
+        <attr name="clearButtonMode">
+            <!--不显示清空按钮-->
+            <enum name="never" value="0" />
+            <!--不为空，获得焦点与没有获得焦点都显示清空按钮-->
+            <enum name="always" value="1" />
+            <!--不为空，且在编辑状态时（及获得焦点）显示清空按钮-->
+            <enum name="whileEditing" value="2" />
+            <!--不为空，且不在编译状态时（焦点不在输入框上）显示清空按钮-->
+            <enum name="unlessEditing" value="3" />
+        </attr>
+        <attr name="clearButtonDrawable" format="reference"/>
+    </declare-styleable>
+</resources>

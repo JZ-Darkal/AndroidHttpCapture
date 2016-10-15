@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ProgressBar
+        android:id="@+id/pb_progress"
+        android:layout_marginTop="-15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:maxHeight="5dp"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:layout_marginRight="5dp"
+        android:id="@+id/bt_jump"
+        android:layout_alignParentRight="true"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:text="GO"/>
+
+    <cn.darkal.networkdiagnosis.View.ClearTextView
+        android:layout_marginLeft="5dp"
+        android:id="@+id/et_url"
+        android:layout_toLeftOf="@id/bt_jump"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="http://h5.darkal.cn/har/guide/widget.basic.html"
+        android:inputType="textUri"
+        app:clearButtonMode="whileEditing"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_below="@id/et_url"
+        android:layout_height="match_parent" >
+
+        <WebView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fl_webview"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</RelativeLayout>

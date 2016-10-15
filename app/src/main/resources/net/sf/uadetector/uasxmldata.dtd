@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!ELEMENT uasdata (data|description)*>
+
+<!ELEMENT description (checksum|version|label)*>
+
+<!ELEMENT label (#PCDATA)>
+
+<!ELEMENT version (#PCDATA)>
+
+<!ELEMENT checksum (#PCDATA)>
+<!ATTLIST checksum
+    type CDATA #IMPLIED
+  >
+
+<!ELEMENT data (devices_reg|devices|operating_systems_reg|browsers_os|browsers_reg|browser_types|browsers|operating_systems|robots)*>
+
+<!ELEMENT robots (robot)*>
+
+<!ELEMENT robot (bot_info_url|icon|url_company|company|name|family|useragent|id)*>
+
+<!ELEMENT id (#PCDATA)>
+
+<!ELEMENT useragent (#PCDATA)>
+
+<!ELEMENT family (#PCDATA)>
+
+
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT company (#PCDATA)>
+
+<!ELEMENT url_company (#PCDATA)>
+
+<!ELEMENT icon (#PCDATA)>
+
+<!ELEMENT bot_info_url (#PCDATA)>
+
+<!ELEMENT operating_systems (os)*>
+
+<!ELEMENT os (os_info_url|icon|url_company|company|url|name|family|id)*>
+
+<!ELEMENT url (#PCDATA)>
+
+<!ELEMENT os_info_url (#PCDATA)>
+
+<!ELEMENT browsers (browser)*>
+
+<!ELEMENT browser (browser_info_url|icon|url_company|company|url|name|type|id)*>
+
+<!ELEMENT type (#PCDATA)>
+
+<!ELEMENT browser_info_url (#PCDATA)>
+
+<!ELEMENT browser_types (browser_type)*>
+
+<!ELEMENT browser_type (type|id)*>
+
+<!ELEMENT browsers_reg (browser_reg)*>
+
+<!ELEMENT browser_reg (regstring|browser_id|order)*>
+
+<!ELEMENT order (#PCDATA)>
+
+<!ELEMENT browser_id (#PCDATA)>
+
+<!ELEMENT regstring (#PCDATA)>
+
+<!ELEMENT browsers_os (browser_os)*>
+
+<!ELEMENT browser_os (os_id|browser_id)*>
+
+<!ELEMENT os_id (#PCDATA)>
+
+<!ELEMENT operating_systems_reg (operating_system_reg)*>
+
+<!ELEMENT operating_system_reg (regstring|os_id|order)*>
+
+<!ELEMENT devices (device)*>
+
+<!ELEMENT device (device_info_url|icon|name|id)*>
+
+<!ELEMENT device_info_url (#PCDATA)>
+
+<!ELEMENT devices_reg (device_reg)*>
+
+<!ELEMENT device_reg (regstring|device_id|order)*>
+
+<!ELEMENT device_id (#PCDATA)>

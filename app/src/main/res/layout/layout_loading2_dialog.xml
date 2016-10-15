@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/jz_toast_bg"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:padding="8dp"
+    android:layout_margin="0dp">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal">
+
+        <ImageView
+            android:id="@+id/pull_to_refresh_image"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_marginBottom="0.5dp"
+            android:layout_gravity="center"
+            android:background="@drawable/refresh" />
+
+        <cn.darkal.networkdiagnosis.View.ProgressWheel
+            android:id="@+id/progressBar"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
+            ProgressWheel:barColor_progress="#E11644"
+            ProgressWheel:barDegree_progress="350"
+            ProgressWheel:barWidth_progress="1.2dp"
+            ProgressWheel:rimColor_progress="#f0f1f3"
+            ProgressWheel:rimWidth_progress="0.5dp"
+            ProgressWheel:spinRimColor_progress="#f0f1f3"
+            ProgressWheel:spinSpeed_progress="5"
+            ProgressWheel:textColor_progress="#222222"
+            ProgressWheel:spinCircleColor_progress="#33ffffff"
+            ProgressWheel:textSize_progress="14sp"
+            ProgressWheel:text_progress="" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/loading_dialog_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/AlertDialogProductMsg2"
+        tools:ignore="RtlHardcoded,RtlSymmetry" />
+</LinearLayout>
