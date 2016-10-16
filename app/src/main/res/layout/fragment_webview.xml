@@ -27,7 +27,7 @@
         android:layout_toLeftOf="@id/bt_jump"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="http://h5.darkal.cn/har/guide/widget.basic.html"
+        android:text="http://www.qq.com"
         android:inputType="textUri"
         app:clearButtonMode="whileEditing"/>
 
