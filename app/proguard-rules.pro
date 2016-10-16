@@ -58,7 +58,7 @@
 -keepnames class * implements java.io.Serializable #不混淆Serializable
 
 -keepclassmembers class **.R$* { #不混淆资源类
-　　public static <fields>;
+    public static <fields>;
 }
 -keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
     native <methods>;

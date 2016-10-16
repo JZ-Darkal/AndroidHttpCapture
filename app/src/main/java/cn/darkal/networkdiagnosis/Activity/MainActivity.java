@@ -93,7 +93,7 @@ import cn.darkal.networkdiagnosis.View.LoadingDialog;
 public class MainActivity extends AppCompatActivity implements BackHandledInterface {
     public final static String CODE_URL = "#";
     public final static String UPLOAD_URL = "#";
-    public final static String HOME_URL = "http://h5.darkal.cn/har/guide/widget.basic.html";
+    public final static String HOME_URL = "http://www.qq.com";
     public final static String GUIDE_URL = "http://h5.darkal.cn/har/guide/widget.guide.html";
 
     public final static int TYPE_NONE = 0;
