@@ -4,7 +4,7 @@
 使用前请确保手机HTTP代理的关闭<br><br>
 ###[Demo APK下载](https://github.com/darkal/AndroidHttpCapture/blob/master/demo.apk)<br><br>
 1． http抓包<br>
-当用户通过HttpInterceptor访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传。<br>
+当用户通过HttpInterceptor访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
 其中预览是请求包在本机的预览，可以查看请求的响应头和响应体(图片类无法查看响应体)<br>
 分享支持分享到微信、分享到手Q等常见分享功能<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG77.jpeg&width=350) 
