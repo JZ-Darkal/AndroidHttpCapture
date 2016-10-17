@@ -39,7 +39,9 @@ public class SysApplication extends MultiDexApplication {
         initProxy();
         // Gradle automatically generates proper variable as below.
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
-        Bugly.init(getApplicationContext(), "8c4787abc3", true);
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+        strategy.setAppChannel("GitHub");
+        Bugly.init(getApplicationContext(), "db9f598223", true);
     }
 
     public void initProxy() {
