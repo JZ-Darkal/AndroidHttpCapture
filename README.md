@@ -2,7 +2,7 @@
 是一款针对于移动流量劫持而开发的手机抓包软件<br>
 主要功能包括：手机端抓包、PING/DNS/TraceRoute诊断、抓包HAR数据上传分享<br>
 使用前请确保手机HTTP代理的关闭<br><br>
-###[Demo APK下载](https://github.com/darkal/AndroidHttpCapture/blob/master/demo.apk)<br><br>
+###[Demo APK下载](https://github.com/darkal/AndroidHttpCapture/blob/master/demo.apk)<br>![image](http://h5.darkal.cn/har/qr.jpg) <br><br>
 1． http抓包<br>
 当用户通过HttpInterceptor访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
 其中预览是请求包在本机的预览，可以查看请求的响应头和响应体(图片类无法查看响应体)<br>
