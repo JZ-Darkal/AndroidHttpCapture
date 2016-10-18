@@ -50,16 +50,14 @@ schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.baid
 AndroidHttpCapture基于Netty、browsermob-proxy来实现核心抓包的功能<br>
 Netty is an asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.<br>
 https://github.com/netty/netty<br>
-由于Aandroid5.0+不支持Provider 为JKS的证书，所以逆向修改了Netty库的证书部分适配Android系统（netty_android.jar）<br><br>
+由于Android5.0+不支持Provider 为JKS的证书，所以逆向修改了Netty库的证书部分适配Android系统（netty_android.jar）<br><br>
 
 A free utility to help web developers watch and manipulate network traffic from their AJAX applications.<br>
 https://github.com/lightbody/browsermob-proxy<br>
 修改了多处browsermob-proxy的源码适配Android系统<br>
 ####目前遗留了一个Bug：信任所有的服务器证书不做校验<br><br>
 
-四．License<br>
-MIT License
-
+MIT License<br>
 Copyright (c) 2016 AndroidHttpCapture
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

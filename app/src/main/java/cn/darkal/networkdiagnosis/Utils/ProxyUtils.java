@@ -35,7 +35,7 @@ public class ProxyUtils {
         } else if (sdkInt < Build.VERSION_CODES.LOLLIPOP) {
             return setProxyKK(webview, host, port, "android.app.Application");
         } else {
-            return setProxyLollipop(webview.getContext(), host, port);
+            return webview.getContext() != null && setProxyLollipop(webview.getContext(), host, port);
         }
     }
 

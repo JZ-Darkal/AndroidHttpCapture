@@ -9,7 +9,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -58,7 +57,6 @@ import net.lightbody.bmp.core.har.HarPage;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,7 +74,6 @@ import cn.darkal.networkdiagnosis.Fragment.BaseFragment;
 import cn.darkal.networkdiagnosis.Fragment.BackHandledInterface;
 import cn.darkal.networkdiagnosis.Fragment.NetworkFragment;
 import cn.darkal.networkdiagnosis.Fragment.PreviewFragment;
-import cn.darkal.networkdiagnosis.Fragment.PreviewFragment_ViewBinder;
 import cn.darkal.networkdiagnosis.Fragment.WebViewFragment;
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
@@ -548,10 +545,14 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent);
-        handleUriStartupParams();
-        if (intent.getAction().equals("android.intent.action.SEARCH")) {
-            switchContent(PreviewFragment.getInstance());
+        try {
+            setIntent(intent);
+            handleUriStartupParams();
+            if (intent.getAction().equals("android.intent.action.SEARCH")) {
+                switchContent(PreviewFragment.getInstance());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
