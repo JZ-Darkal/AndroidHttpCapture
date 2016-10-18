@@ -16,11 +16,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import net.lightbody.bmp.core.har.HarEntry;
+import net.lightbody.bmp.core.har.HarLog;
+
 import java.nio.charset.Charset;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.darkal.networkdiagnosis.R;
+import cn.darkal.networkdiagnosis.SysApplication;
 
 /**
  * Created by Darkal on 2016/9/20.
@@ -48,8 +52,15 @@ public class JsonPreviewActivity extends AppCompatActivity {
         setupActionBar();
 
         try {
-            content = getIntent().getStringExtra("content");
-            initViewDelay(content);
+            int pos = getIntent().getIntExtra("pos",-1);
+            if(pos > -1){
+                HarLog harLog = ((SysApplication) getApplication()).proxy.getHar().getLog();
+                HarEntry harEntry = harLog.getEntries().get(pos);
+                content = harEntry.getResponse().getContent().getText();
+                initViewDelay(content);
+            }else{
+                finish();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             finish();
