@@ -172,7 +172,9 @@ public class PreviewFragment extends BaseFragment {
                 @Override
                 protected void publishResults(CharSequence constraint, FilterResults results) {
                     harEntryList.clear();//清除原始数据
-                    harEntryList.addAll((List<HarEntry>) results.values);//将过滤结果添加到这个对象
+                    if(results.values instanceof List){
+                        harEntryList.addAll((List<HarEntry>) results.values);//将过滤结果添加到这个对象
+                    }
                     if (results.count > 0) {
                         previewAdapter.notifyDataSetChanged();//有关键字的时候刷新数据
                     } else {

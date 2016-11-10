@@ -96,6 +96,8 @@ public class WebViewFragment extends BaseFragment {
 
         isSetProxy = false;
 
+        urlText.setText(MainActivity.HOME_URL);
+
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccess(true);

@@ -26,7 +26,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 18
-        versionName "2.4.18"
+        versionName "2.4.21"
         // Enabling multidex support.
         multiDexEnabled true
         resConfigs "zh"

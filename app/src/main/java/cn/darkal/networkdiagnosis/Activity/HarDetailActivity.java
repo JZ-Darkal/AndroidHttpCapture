@@ -1,12 +1,12 @@
 package cn.darkal.networkdiagnosis.Activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +19,6 @@ import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.core.har.HarNameValuePair;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
-
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -122,19 +118,23 @@ public class HarDetailActivity extends AppCompatActivity {
             addItem("RedirectURL", harResponse.getRedirectURL());
         }
         if (harResponse.getContent().getText() != null && harResponse.getContent().getText().length() > 0) {
-            addItem("Content", harResponse.getContent().getText(), pos);
+            addContentItem("Content", harResponse.getContent().getText(), pos);
         }
 
     }
 
-    public void addItem(String title, final String value, final int pos) {
+    public void addContentItem(String title, final String value, final int pos) {
         View view = LayoutInflater.from(this).inflate(R.layout.item_detail, null);
 
         TextView textView = (TextView) view.findViewById(R.id.tv_title);
         textView.setText(title);
 
         TextView valueTextView = (TextView) view.findViewById(R.id.tv_value);
-        valueTextView.setText(value.substring(0, value.length() > 50 ? 50 : value.length()));
+        if (TextUtils.isEmpty(value)) {
+            valueTextView.setText("");
+        } else {
+            valueTextView.setText(value.substring(0, value.length() > 50 ? 50 : value.length()));
+        }
 
         if (title.equals("Content")) {
             view.setOnClickListener(new View.OnClickListener() {
@@ -158,7 +158,11 @@ public class HarDetailActivity extends AppCompatActivity {
         textView.setText(title);
 
         TextView valueTextView = (TextView) view.findViewById(R.id.tv_value);
-        valueTextView.setText(value.substring(0, value.length() > 50 ? 50 : value.length()));
+        if (TextUtils.isEmpty(value)) {
+            valueTextView.setText("");
+        } else {
+            valueTextView.setText(value.substring(0, value.length() > 50 ? 50 : value.length()));
+        }
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
