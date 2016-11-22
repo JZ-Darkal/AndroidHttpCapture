@@ -77,10 +77,10 @@ public class HarDetailActivity extends AppCompatActivity {
 
         addItem("Request Header");
         for (HarNameValuePair pair : harRequest.getHeaders()) {
-            if (pair.getName().equals("Cookie")) {
-                break;
+            // 不显示cookie
+            if (!pair.getName().equals("Cookie")) {
+                addItem(pair.getName(), pair.getDecodeValue());
             }
-            addItem(pair.getName(), pair.getDecodeValue());
         }
 
         if (harRequest.getCookies().size() > 0) {
@@ -97,10 +97,9 @@ public class HarDetailActivity extends AppCompatActivity {
 
         addItem("Response Header");
         for (HarNameValuePair pair : harResponse.getHeaders()) {
-            if (pair.getName().equals("Cookie")) {
-                break;
+            if (!pair.getName().equals("Cookie")) {
+                addItem(pair.getName(), pair.getDecodeValue());
             }
-            addItem(pair.getName(), pair.getDecodeValue());
         }
 
         if (harResponse.getCookies().size() > 0) {

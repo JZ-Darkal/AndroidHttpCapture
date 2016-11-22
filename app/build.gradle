@@ -25,8 +25,8 @@ android {
         applicationId "cn.darkal.networkdiagnosis"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 18
-        versionName "2.4.21"
+        versionCode 24
+        versionName "2.4.24"
         // Enabling multidex support.
         multiDexEnabled true
         resConfigs "zh"

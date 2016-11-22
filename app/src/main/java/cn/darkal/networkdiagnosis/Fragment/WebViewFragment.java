@@ -250,10 +250,11 @@ public class WebViewFragment extends BaseFragment {
             webView.post(new Runnable() {
                 @Override
                 public void run() {
-                    ProxyUtils.setProxy(webView, "127.0.0.1", SysApplication.proxyPort);
-                    Log.e("~~~~", "initProxyWebView()");
-                    webView.loadUrl(urlText.getText() + "");
-                    isSetProxy = true;
+                    if(ProxyUtils.setProxy(webView, "127.0.0.1", SysApplication.proxyPort)){
+                        Log.e("~~~~", "initProxyWebView()");
+                        webView.loadUrl(urlText.getText() + "");
+                        isSetProxy = true;
+                    }
                 }
             });
         }
