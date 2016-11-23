@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -254,6 +255,8 @@ public class WebViewFragment extends BaseFragment {
                         Log.e("~~~~", "initProxyWebView()");
                         webView.loadUrl(urlText.getText() + "");
                         isSetProxy = true;
+                    }else{
+                        Toast.makeText(webView.getContext(),"Set proxy fail!",Toast.LENGTH_LONG).show();
                     }
                 }
             });

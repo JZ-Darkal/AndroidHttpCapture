@@ -267,40 +267,6 @@ public class ProxyUtils {
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private static boolean setProxyLollipop(final Context context, String host, int port) {
-//        Log.i(LOG_TAG, "setProxyLollipop");
-//        if (null == host) {
-//            System.clearProperty("http.proxyHost");
-//            System.clearProperty("http.proxyPort");
-//        } else {
-//            System.setProperty("http.proxyHost", host);
-//            System.setProperty("http.proxyPort", port + "");
-//        }
-//        try {
-//            Context appContext = context.getApplicationContext();
-//            Class applicationClass = Class.forName("android.app.Application");
-//            Field mLoadedApkField = applicationClass.getDeclaredField("mLoadedApk");
-//            mLoadedApkField.setAccessible(true);
-//            Object mloadedApk = mLoadedApkField.get(appContext);
-//            Class loadedApkClass = Class.forName("android.app.LoadedApk");
-//            Field mReceiversField = loadedApkClass.getDeclaredField("mReceivers");
-//            mReceiversField.setAccessible(true);
-//            Map receivers = (Map) mReceiversField.get(mloadedApk);
-//            for (Object receiverMap : receivers.values()) {
-//                for (Object receiver : ((Map) receiverMap).keySet()) {
-//                    Class clazz = receiver.getClass();
-//                    if (clazz.getName().contains("ProxyChangeListener")) {
-//                        Method onReceiveMethod = clazz.getDeclaredMethod("onReceive", Context.class, Intent.class);
-//                        Intent intent = new Intent(Proxy.PROXY_CHANGE_ACTION);
-//                        onReceiveMethod.invoke(receiver, appContext, intent);
-//                    }
-//                }
-//            }
-//            Log.i(LOG_TAG, "Lollipop successfully");
-//            return true;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         System.setProperty("http.proxyHost", host);
         System.setProperty("http.proxyPort", port + "");
         System.setProperty("https.proxyHost", host);
@@ -327,9 +293,10 @@ public class ProxyUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private static Object getFieldValueSafely(Field field, Object classInstance) throws IllegalArgumentException, IllegalAccessException {

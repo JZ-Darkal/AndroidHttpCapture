@@ -25,6 +25,11 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme">
 
+        <!-- 配置APP渠道号 -->
+        <meta-data
+            android:name="BUGLY_APP_CHANNEL"
+            android:value="Github" />
+
         <activity
             android:name="cn.darkal.networkdiagnosis.Activity.MainActivity"
             android:configChanges="orientation|keyboardHidden"
