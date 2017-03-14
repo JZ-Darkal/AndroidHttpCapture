@@ -272,12 +272,13 @@ public class WebViewFragment extends BaseFragment {
     }
 
     public void loadUrl(String url) {
-        if (!isSetProxy) {
-            ProxyUtils.setProxy(webView, "127.0.0.1", SysApplication.proxyPort);
-            Log.e("~~~~", "initProxyWebView()");
-            isSetProxy = true;
-        }
         if (webView != null) {
+            if (!isSetProxy) {
+                ProxyUtils.setProxy(webView, "127.0.0.1", SysApplication.proxyPort);
+                Log.e("~~~~", "initProxyWebView()");
+                isSetProxy = true;
+            }
+
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
                 url = "http://" + url;
             }
