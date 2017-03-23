@@ -2,9 +2,9 @@
 是一款针对于移动流量劫持而开发的手机抓包软件<br>
 主要功能包括：手机端抓包、PING/DNS/TraceRoute诊断、抓包HAR数据上传分享<br>
 使用前请确保手机HTTP代理的关闭<br><br>
-###[Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>![image](http://h5.darkal.cn/har/1478783982.jpg) <br><br>
+###[Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>![image](http://h5.darkal.cn/har/1478783982.jpg?t=1) <br><br>
 1． http抓包<br>
-当用户通过HttpInterceptor访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
+当用户通过AndroidHttpCapture访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
 ####第一次进入程序需要安装CA证书以便进行HTTPS抓包（原理同fiddler，MITM中间人）<br>
 预览页面可以查看从APP启动起所有网络请求数据，实现了按分页过滤、URL搜索功能，并可清空所有数据包<br>
 预览的内容包括Request Header、Request Cookie、Request Content、Response Header、Response Cookie、Response Content<br>
@@ -18,8 +18,7 @@ Content内容如果为JSON将会自动格式化显示<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG81.jpeg&width=350)<br><br>
 
 3． 多样性输入：导航、地址栏、扫一扫、schema呼起<br>
-HttpInterceptor的首页为一个导航页，目前集成了微信和手Q的一级和二级入口，可以快速直达各目标页面。<br>
-另外还支持地址栏直接输入地址，扫扫描二维码，以及schema呼起app并打开目标页面。<br>
+支持地址栏直接输入地址，扫扫描二维码，以及schema呼起app并打开目标页面。<br>
 schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.baidu.com'}<br><br>
 
 4． Host配置<br>
@@ -32,10 +31,10 @@ schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.baid
 
 
 6． 网络工具<br>
-目前HttpInterceptor集成了常见的网络工具，如dns,ping,以及设备信息<br><br>
+目前AndroidHttpCapture集成了常见的网络工具，如dns,ping,以及设备信息<br><br>
 
-7． 设置系统代理，监听其他app请求包（仅android版支持）<br>
-当将用户所使用的wifi代理服务器设置为127.0.0.1：8888时，可以对其他app进行抓包（此时该HttpInterceptor就是一个手机上的fiddler）<br>
+7． 设置系统代理，监听其他app请求包<br>
+当将用户手机的代理服务器设置为127.0.0.1:8888时，可以对其他app进行抓包（此时AndroidHttpCapture就是一个手机上的fiddler）<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG80.jpeg&width=350)<br><br>
 
  
