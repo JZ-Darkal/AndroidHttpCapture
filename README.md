@@ -1,11 +1,16 @@
-##AndroidHttpCapture网络诊断工具<br>
-是一款针对于移动流量劫持而开发的手机抓包软件<br>
+## AndroidHttpCapture网络诊断工具<br>
+是一款针对于移动流量劫持而开发的手机抓包软件，可以当作是Android版的‘Fiddler’<br>
 主要功能包括：手机端抓包、PING/DNS/TraceRoute诊断、抓包HAR数据上传分享<br>
 使用前请确保手机HTTP代理的关闭<br><br>
-###[Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>![image](http://h5.darkal.cn/har/1478783982.jpg?t=1) <br><br>
-1． http抓包<br>
+### [Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>![image](http://h5.darkal.cn/har/1478783982.jpg?t=1) <br><br>
+
+### [点击查看操作手册](http://h5.darkal.cn/har/guide/widget.guide.html)<br><br>
+
+
+### 功能简介
+1． HTTP/HTTPS抓包<br>
 当用户通过AndroidHttpCapture访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
-####第一次进入程序需要安装CA证书以便进行HTTPS抓包（原理同fiddler，MITM中间人）<br>
+#### 第一次进入程序需要安装CA证书以便进行HTTPS抓包（原理同fiddler，MITM中间人）不安装证书的话无法抓取HTTPS的请求<br>
 预览页面可以查看从APP启动起所有网络请求数据，实现了按分页过滤、URL搜索功能，并可清空所有数据包<br>
 预览的内容包括Request Header、Request Cookie、Request Content、Response Header、Response Cookie、Response Content<br>
 Content内容如果为JSON将会自动格式化显示<br>
@@ -19,7 +24,7 @@ Content内容如果为JSON将会自动格式化显示<br>
 
 3． 多样性输入：导航、地址栏、扫一扫、schema呼起<br>
 支持地址栏直接输入地址，扫扫描二维码，以及schema呼起app并打开目标页面。<br>
-schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.baidu.com'}<br><br>
+schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.darkal.cn'}<br><br>
 
 4． Host配置<br>
 可以配置各域名的host<br>
@@ -31,21 +36,21 @@ schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.baid
 
 
 6． 网络工具<br>
-目前AndroidHttpCapture集成了常见的网络工具，如dns,ping,以及设备信息<br><br>
+目前AndroidHttpCapture集成了常见的网络工具，如dns,ping,以及设备信息<br>
+![image](https://www.darkal.cn/imgd.php?src=/2016/09/621495078826.jpg&width=350)<br><br>
 
 7． 设置系统代理，监听其他app请求包<br>
-当将用户手机的代理服务器设置为127.0.0.1:8888时，可以对其他app进行抓包（此时AndroidHttpCapture就是一个手机上的fiddler）<br>
+当将用户手机的代理服务器设置为127.0.0.1:8888时，可以对其他app（例如微信）的HTTP数据进行抓包<br>
+（此时AndroidHttpCapture就是一个手机上的fiddler）<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG80.jpeg&width=350)<br><br>
-
  
-二．Q & A<br>
+### Q & A<br>
 1. 分享的http包如何查看和分析？<br>
-    分享的http包格式后缀为.har,可以通过fiddler方式或者在线工具进行分析。<br>
+    分享的文件解压后为.har文件,可以通过fiddler方式或者在线工具进行分析。<br>
     Fiddler方式需要先将包导到电脑上，然后使用fiddler导入该包：Import Sessions->Select Import Format ->HTTPArchive ->选择包，即可<br>
-    在线工具外网：http://h5.darkal.cn/har/<br>
-    只需要将包拖入此工具即可分析<br><br>
+    在线工具外网：http://h5.darkal.cn/har/ 只需要将包拖入此工具即可分析<br><br>
     
-三．致谢<br>
+### 致谢<br>
 AndroidHttpCapture基于Netty、browsermob-proxy来实现核心抓包的功能<br>
 Netty is an asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.<br>
 https://github.com/netty/netty<br>
@@ -54,7 +59,7 @@ https://github.com/netty/netty<br>
 A free utility to help web developers watch and manipulate network traffic from their AJAX applications.<br>
 https://github.com/lightbody/browsermob-proxy<br>
 修改了多处browsermob-proxy的源码适配Android系统<br>
-####目前遗留了一个Bug：信任所有的服务器证书不做校验<br><br>
+#### 目前遗留了一个Bug：信任所有的服务器证书不做校验<br><br>
 
 MIT License<br>
 Copyright (c) 2016 AndroidHttpCapture
