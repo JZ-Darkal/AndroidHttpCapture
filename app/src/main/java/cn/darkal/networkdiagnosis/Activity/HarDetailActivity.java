@@ -17,6 +17,7 @@ import net.lightbody.bmp.core.har.HarCookie;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.core.har.HarNameValuePair;
+import net.lightbody.bmp.core.har.HarPostDataParam;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
 
@@ -91,8 +92,20 @@ public class HarDetailActivity extends AppCompatActivity {
         }
 
         if (harRequest.getPostData() != null) {
-            addItem("Request Content");
-            addItem("PostData", harRequest.getPostData().getText());
+            if(harRequest.getPostData().getText()!= null
+                    && harRequest.getPostData().getText().length()>0) {
+                addItem("Request Content");
+                addItem("PostData", harRequest.getPostData().getText());
+            }
+
+            if(harRequest.getPostData().getParams()!= null
+                    &&  harRequest.getPostData().getParams().size()>0){
+                addItem("Request PostData");
+
+                for (HarPostDataParam pair : harRequest.getPostData().getParams()) {
+                    addItem(pair.getName(), pair.getValue());
+                }
+            }
         }
 
         addItem("Response Header");
