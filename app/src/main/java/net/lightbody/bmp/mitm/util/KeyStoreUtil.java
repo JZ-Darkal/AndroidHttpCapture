@@ -28,7 +28,7 @@ public class KeyStoreUtil {
      */
     public static KeyStore createEmptyKeyStore(String keyStoreType, String provider) {
         if (keyStoreType == null) {
-            keyStoreType = "BKS";
+            keyStoreType = KeyStore.getDefaultType();
         }
 
         KeyStore keyStore;

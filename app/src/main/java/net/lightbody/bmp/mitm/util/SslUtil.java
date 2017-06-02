@@ -3,35 +3,31 @@ package net.lightbody.bmp.mitm.util;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.CharStreams;
-
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SupportedCipherSuiteFilter;
+import net.lightbody.bmp.mitm.trustmanager.InsecureTrustManagerFactory;
 import net.lightbody.bmp.mitm.TrustSource;
 import net.lightbody.bmp.mitm.exception.SslContextInitializationException;
-import net.lightbody.bmp.mitm.trustmanager.InsecureTrustManagerFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
-
-import io.netty.handler.ssl.OpenSsl;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 
 /**
  * Utility for creating SSLContexts.
@@ -173,7 +169,7 @@ public class SslUtil {
                 return Collections.emptyList();
             }
 
-            Reader reader = new InputStreamReader(cipherListStream, Charset.forName("UTF-8"));
+            Reader reader = new InputStreamReader(cipherListStream, StandardCharsets.UTF_8);
 
             return CharStreams.readLines(reader);
         } catch (IOException e) {

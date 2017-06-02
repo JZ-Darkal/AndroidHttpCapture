@@ -1,7 +1,6 @@
 package net.lightbody.bmp;
 
 import net.lightbody.bmp.core.har.Har;
-import net.lightbody.bmp.core.har.HarPage;
 import net.lightbody.bmp.filters.RequestFilter;
 import net.lightbody.bmp.filters.ResponseFilter;
 import net.lightbody.bmp.mitm.TrustSource;
@@ -107,7 +106,6 @@ public interface BrowserMobProxy {
      * @return current HAR, or null if HAR capture is not enabled
      */
     Har getHar();
-
 
     Har getHar(Set<String> pageRef);
 
@@ -227,13 +225,6 @@ public interface BrowserMobProxy {
      * @throws java.lang.IllegalStateException if HAR capture has not been enabled via {@link #newHar()} or {@link #newHar(String)}
      */
     Har newPage(String pageRef, String pageTitle);
-
-    /**
-     * 删除page
-     *
-     * @return the HAR as it existed immediately after ending the current page
-     **/
-    Boolean deletePage(HarPage harPage);
 
     /**
      * Stops capturing traffic in the HAR. Populates the {@link net.lightbody.bmp.core.har.HarPageTimings#onLoad} value for the current page
@@ -565,9 +556,11 @@ public interface BrowserMobProxy {
     boolean waitForQuiescence(long quietPeriod, long timeout, TimeUnit timeUnit);
 
     /**
-     * Sets an upstream proxy that this proxy will use to connect to external hosts.
+     * Instructs this proxy to route traffic through an upstream proxy.
      *
-     * @param chainedProxyAddress address and port of the upstream proxy, or null to remove an upstream proxy
+     * <b>Note:</b> A chained proxy must be set before the proxy is started, though it can be changed after the proxy is started.
+     *
+     * @param chainedProxyAddress address of the upstream proxy
      */
     void setChainedProxy(InetSocketAddress chainedProxyAddress);
 

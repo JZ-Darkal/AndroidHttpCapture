@@ -20,7 +20,7 @@ import cn.darkal.networkdiagnosis.Utils.DatatypeConverter;
  */
 public class ISO8601WithTDZDateFormatter extends JsonSerializer<Date> {
     @Override
-    public void serialize(java.util.Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+    public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
         Calendar cal = Calendar.getInstance();
         cal.setTime(value);
         jgen.writeString(DatatypeConverter.doFormat("%Y-%M-%DT%h:%m:%s%z",cal));

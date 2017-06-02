@@ -34,8 +34,7 @@ public class ClasspathResourceUtil {
             throw new IllegalArgumentException("Character set cannot be null");
         }
 
-        try {
-            InputStream resourceAsStream = ClasspathResourceUtil.class.getResourceAsStream(resource);
+        try (InputStream resourceAsStream = ClasspathResourceUtil.class.getResourceAsStream(resource)) {
             if (resourceAsStream == null) {
                 throw new UncheckedIOException(new FileNotFoundException("Unable to locate classpath resource: " + resource));
             }

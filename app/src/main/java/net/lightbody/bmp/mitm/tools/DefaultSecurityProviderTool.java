@@ -1,13 +1,13 @@
 package net.lightbody.bmp.mitm.tools;
 
 import com.google.common.io.CharStreams;
-
 import net.lightbody.bmp.mitm.CertificateAndKey;
 import net.lightbody.bmp.mitm.CertificateInfo;
 import net.lightbody.bmp.mitm.exception.ImportException;
 import net.lightbody.bmp.mitm.exception.KeyStoreAccessException;
 import net.lightbody.bmp.mitm.util.KeyStoreUtil;
 
+import javax.net.ssl.KeyManager;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,8 +25,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
-import javax.net.ssl.KeyManager;
 
 /**
  * A {@link SecurityProviderTool} implementation that uses the default system Security provider where possible, but uses the
@@ -103,8 +101,7 @@ public class DefaultSecurityProviderTool implements SecurityProviderTool {
 
         // the JCA CertificateFactory takes an InputStream, so convert the reader to a stream first. converting to a String first
         // is not ideal, but is relatively straightforward. (PEM certificates should only contain US_ASCII-compatible characters.)
-        try {
-            InputStream certificateAsStream = new ByteArrayInputStream(CharStreams.toString(certificateReader).getBytes(Charset.forName("US-ASCII")));
+        try (InputStream certificateAsStream = new ByteArrayInputStream(CharStreams.toString(certificateReader).getBytes(StandardCharsets.US_ASCII))) {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             certificate = certificateFactory.generateCertificate(certificateAsStream);
         } catch (CertificateException | IOException e) {
@@ -135,8 +132,7 @@ public class DefaultSecurityProviderTool implements SecurityProviderTool {
             throw new KeyStoreAccessException("Unable to get KeyStore instance of type: " + keyStoreType, e);
         }
 
-        try {
-            InputStream keystoreAsStream = new FileInputStream(file);
+        try (InputStream keystoreAsStream = new FileInputStream(file)) {
             keyStore.load(keystoreAsStream, password.toCharArray());
         } catch (IOException e) {
             throw new ImportException("Unable to read KeyStore from file: " + file.getName(), e);
@@ -156,8 +152,7 @@ public class DefaultSecurityProviderTool implements SecurityProviderTool {
      */
     @Override
     public void saveKeyStore(File file, KeyStore keyStore, String keystorePassword) {
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             keyStore.store(fos, keystorePassword.toCharArray());
         } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
             throw new KeyStoreAccessException("Unable to save KeyStore to file: " + file.getName(), e);

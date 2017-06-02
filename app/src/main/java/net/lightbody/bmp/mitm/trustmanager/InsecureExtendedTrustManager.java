@@ -1,8 +1,12 @@
 package net.lightbody.bmp.mitm.trustmanager;
 
+import io.netty.util.internal.EmptyArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import java.net.Socket;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -10,12 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
 import cn.darkal.networkdiagnosis.Utils.X509ExtendedTrustManager;
-import io.netty.util.internal.EmptyArrays;
 
 /**
  * An {@link X509ExtendedTrustManager} and {@link javax.net.ssl.X509TrustManager} that will accept all server and client
@@ -24,11 +23,6 @@ import io.netty.util.internal.EmptyArrays;
  */
 public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     private static final Logger log = LoggerFactory.getLogger(InsecureExtendedTrustManager.class);
-
-    /**
-     * The default extended trust manager, which will be used to determine if certificates would otherwise be trusted.
-     */
-    protected static final X509ExtendedTrustManager DEFAULT_EXTENDED_TRUST_MANAGER = getDefaultExtendedTrustManager();
 
     /**
      * An {@link X509ExtendedTrustManager} that does no certificate validation whatsoever.
@@ -64,11 +58,16 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
         }
     };
 
+    /**
+     * The default extended trust manager, which will be used to determine if certificates would otherwise be trusted.
+     */
+    protected static final X509ExtendedTrustManager DEFAULT_EXTENDED_TRUST_MANAGER = getDefaultExtendedTrustManager();
+
     @Override
     public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkClientTrusted(x509Certificates, s, socket);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted client certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }
@@ -77,7 +76,7 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     public void checkServerTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkServerTrusted(x509Certificates, s, socket);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted server certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }
@@ -86,7 +85,7 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     public void checkClientTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkClientTrusted(x509Certificates, s, sslEngine);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted client certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }
@@ -95,7 +94,7 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     public void checkServerTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkServerTrusted(x509Certificates, s, sslEngine);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted server certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }
@@ -104,7 +103,7 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkClientTrusted(x509Certificates, s);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted client certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }
@@ -113,7 +112,7 @@ public class InsecureExtendedTrustManager extends X509ExtendedTrustManager {
     public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         try {
             DEFAULT_EXTENDED_TRUST_MANAGER.checkServerTrusted(x509Certificates, s);
-        } catch (Exception e) {
+        } catch (CertificateException e) {
             log.debug("Accepting an untrusted server certificate: {}", x509Certificates[0].getSubjectDN(), e);
         }
     }

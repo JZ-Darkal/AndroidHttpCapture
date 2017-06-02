@@ -21,9 +21,15 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
+import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
+import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 
 /**
  * Created by xuzhou on 2016/8/10.
@@ -32,6 +38,7 @@ public class SysApplication extends MultiDexApplication {
     public static Boolean isInitProxy = false;
     public static int proxyPort = 8888;
     public BrowserMobProxy proxy;
+    public List<ResponseFilterRule> ruleList;
 
     @Override
     public void onCreate() {
@@ -95,15 +102,18 @@ public class SysApplication extends MultiDexApplication {
         }
         Log.e("~~~", proxy.getPort() + "");
 
-        proxy.enableHarCaptureTypes(CaptureType.REQUEST_HEADERS, CaptureType.REQUEST_COOKIES,
-                CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_HEADERS, CaptureType.REQUEST_COOKIES,
-                CaptureType.RESPONSE_CONTENT);
 
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
-                .format(new Date(System.currentTimeMillis()));
-        proxy.newHar(time);
+        Object object = SharedPreferenceUtils.get(this.getApplicationContext(), "response_filter");
+        if (object != null && object instanceof List) {
+            ruleList = (List<ResponseFilterRule>) object;
+        }
 
         SharedPreferences shp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        if(shp.getBoolean("enable_filter", false)) {
+            Log.e("~~~enable_filter", "");
+            initResponseFilter();
+        }
 
         // 设置hosts
         if(shp.getString("system_host", "").length()>0){
@@ -117,6 +127,39 @@ public class SysApplication extends MultiDexApplication {
             proxy.setHostNameResolver(advancedHostResolver);
         }
 
+        proxy.enableHarCaptureTypes(CaptureType.REQUEST_HEADERS, CaptureType.REQUEST_COOKIES,
+                CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_HEADERS, CaptureType.REQUEST_COOKIES,
+                CaptureType.RESPONSE_CONTENT);
+
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
+                .format(new Date(System.currentTimeMillis()));
+        proxy.newHar(time);
+
+
         isInitProxy = true;
+    }
+
+    public void stopProxy(){
+        if(proxy!=null){
+            proxy.stop();
+        }
+    }
+
+    private void initResponseFilter(){
+        try {
+            if(ruleList == null){
+                ResponseFilterRule rule = new ResponseFilterRule();
+                rule.setUrl("xw.qq.com/index.htm");
+                rule.setReplaceRegex("</head>");
+                rule.setReplaceContent("<script>alert('修改包测试')</script></head>");
+
+                ruleList = new ArrayList<>();
+                ruleList.add(rule);
+            }
+
+            DeviceUtils.changeResponseFilter(this,ruleList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

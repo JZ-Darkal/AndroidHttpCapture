@@ -1,13 +1,13 @@
 package net.lightbody.bmp.core.har;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import net.lightbody.bmp.core.json.ISO8601WithTDZDateFormatter;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

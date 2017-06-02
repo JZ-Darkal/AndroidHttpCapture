@@ -1,9 +1,8 @@
 package net.lightbody.bmp.util;
 
+import com.google.common.io.BaseEncoding;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.MediaType;
-
-import cn.darkal.networkdiagnosis.Utils.DatatypeConverter;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpRequest;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -42,14 +42,18 @@ public class BrowserMobHttpUtil {
     public static final String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
 
     /**
-     * The default charset when the Content-Type header does not specify a charset. From the HTTP 1.1 spec section 3.7.1:
+     * The default charset when the Content-Type header does not specify a charset. According to RFC 7231 Appendix B:
      * <pre>
-     *     When no explicit charset parameter is provided by the sender, media subtypes of the "text" type are defined to have a default
-     *     charset value of "ISO-8859-1" when received via HTTP. Data in character sets other than "ISO-8859-1" or its subsets MUST be
-     *     labeled with an appropriate charset value.
+     *     The default charset of ISO-8859-1 for text media types has been
+     *     removed; the default is now whatever the media type definition says.
+     *     Likewise, special treatment of ISO-8859-1 has been removed from the
+     *     Accept-Charset header field.
      * </pre>
+     *
+     * Technically, we would have to determine the charset on a per-content-type basis, but generally speaking, UTF-8 is a
+     * pretty safe default. (NOTE: In the previous HTTP/1.1 spec, section 3.7.1, the default charset was defined as ISO-8859-1.)
      */
-    public static final Charset DEFAULT_HTTP_CHARSET = Charset.forName("ISO-8859-1");
+    public static final Charset DEFAULT_HTTP_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Buffer size when decompressing content.
@@ -290,7 +294,7 @@ public class BrowserMobHttpUtil {
         String credentialsToEncode = username + ':' + password;
         // using UTF-8, which is the modern de facto standard, and which retains compatibility with US_ASCII for ASCII characters,
         // as required by RFC 7616, section 3: http://tools.ietf.org/html/rfc7617#section-3
-        byte[] credentialsAsUtf8Bytes = credentialsToEncode.getBytes(Charset.forName("UTF-8"));
-        return new String(DatatypeConverter.parseBase64Binary(new String(credentialsAsUtf8Bytes)));
+        byte[] credentialsAsUtf8Bytes = credentialsToEncode.getBytes(StandardCharsets.UTF_8);
+        return BaseEncoding.base64().encode(credentialsAsUtf8Bytes);
     }
 }

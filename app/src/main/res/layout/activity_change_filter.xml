@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_change_filter"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.darkal.networkdiagnosis.Activity.ChangeFilterActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <ListView
+            android:id="@+id/lv_filter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:src="@drawable/fab_add"
+            android:padding="5dp"
+            android:layout_margin="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            app:layout_anchor="@id/lv_filter"
+            app:layout_anchorGravity="bottom|right" />
+    </FrameLayout>
+
+</RelativeLayout>

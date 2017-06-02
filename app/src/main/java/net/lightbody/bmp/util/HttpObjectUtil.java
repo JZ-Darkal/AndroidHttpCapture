@@ -4,6 +4,8 @@ import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMessage;
+import io.netty.handler.codec.http.LastHttpContent;
+
 import net.lightbody.bmp.exception.UnsupportedCharsetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,31 @@ public class HttpObjectUtil {
         replaceBinaryHttpEntityBody(message, contentBytes);
     }
 
+
+    public static void replaceTextHttpEntityBody(LastHttpContent message, String newContents) {
+        // get the content type for this message so we can encode the newContents into a byte stream appropriately
+        String contentTypeHeader = message.trailingHeaders().get(HttpHeaders.Names.CONTENT_TYPE);
+
+        Charset messageCharset;
+        try {
+            messageCharset = BrowserMobHttpUtil.readCharsetInContentTypeHeader(contentTypeHeader);
+        } catch (UnsupportedCharsetException e) {
+            java.nio.charset.UnsupportedCharsetException cause = e.getUnsupportedCharsetExceptionCause() ;
+            log.error("Found unsupported character set in Content-Type header '{}' while attempting to replace contents of HTTP message.", contentTypeHeader, cause);
+
+            throw cause;
+        }
+
+        if (messageCharset == null) {
+            messageCharset = BrowserMobHttpUtil.DEFAULT_HTTP_CHARSET;
+            log.warn("No character set declared in HTTP message. Replacing text using default charset {}.", messageCharset);
+        }
+
+        byte[] contentBytes = newContents.getBytes(messageCharset);
+
+        replaceBinaryHttpEntityBody(message, contentBytes);
+    }
+
     /**
      * Replaces an HTTP entity body with the specified binary contents.
      * TODO: Currently this method only works for FullHttpMessages, since it must modify the Content-Length header; determine if this may be applied to chunked messages as well
@@ -67,6 +94,17 @@ public class HttpObjectUtil {
 
         // update the Content-Length header, since the size may have changed
         message.headers().set(HttpHeaders.Names.CONTENT_LENGTH, newBinaryContents.length);
+    }
+
+    public static void replaceBinaryHttpEntityBody(LastHttpContent message, byte[] newBinaryContents) {
+//        message.content().capacity(newBinaryContents.length);
+        message.content().clear();
+        // resize the buffer if needed, since the new message may be longer than the old one
+        message.content().ensureWritable(newBinaryContents.length, true);
+        message.content().writeBytes(newBinaryContents);
+
+        // update the Content-Length header, since the size may have changed
+//        message.trailingHeaders().set(HttpHeaders.Names.CONTENT_LENGTH, newBinaryContents.length);
     }
 
     /**

@@ -1,10 +1,9 @@
 package net.lightbody.bmp.core.har;
 
-import java.util.Date;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import net.lightbody.bmp.core.json.ISO8601WithTDZDateFormatter;
+
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HarPage {
@@ -35,7 +34,7 @@ public class HarPage {
         this.id = id;
     }
 
-    @JsonSerialize(using = ISO8601WithTDZDateFormatter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     public Date getStartedDateTime() {
         return startedDateTime;
     }

@@ -32,9 +32,6 @@ public class HarPostData {
     }
 
     public void setText(String text) {
-        if(text != null && text.length()>100000){
-            text = "HarPostData is too large! Size:"+text.length();
-        }
         this.text = text;
     }
 

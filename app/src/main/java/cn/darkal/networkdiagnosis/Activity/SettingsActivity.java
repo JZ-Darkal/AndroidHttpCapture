@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -64,8 +65,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
     ListPreference lp;//创建一个ListPreference对象
     Preference hostPreference;
 
-    String path;
-
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
@@ -88,6 +87,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
         lp.setSummary(lp.getEntry());
 
         findPreference("system_host").setOnPreferenceChangeListener(this);
+
+        findPreference("enable_filter").setOnPreferenceChangeListener(this);
 
         findPreference("install_cert").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -163,12 +164,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
             DeviceUtils.changeHost(((SysApplication)getApplication()).proxy,newValue.toString());
             hostPreference.setSummary(getHost());
         }
+
+        // 重启抓包进程
+        if (preference.getKey().equals("enable_filter")) {
+            Toast.makeText(this, "重启程序后生效", Toast.LENGTH_SHORT).show();
+//            ((SysApplication)getApplication()).stopProxy();
+//            ((SysApplication)getApplication()).startProxy();
+//            Toast.makeText(this, "抓包进程重启完成", Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 
 
     public void installCert() {
-        final String CERTIFICATE_RESOURCE = "/sslSupport/ca-certificate-rsa.cer";
+        final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
         Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
         try {
             byte[] keychainBytes;

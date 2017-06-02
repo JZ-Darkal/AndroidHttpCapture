@@ -11,17 +11,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Modify by xuzhou on 2016/9/2.
- * 添加了删除page的功能
- * 添加了clearAllEntries
- * 1000请求自动分页
- */
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HarLog {
     private final String version = "1.2";
-    private volatile HarNameVersion creator = new HarNameVersion("BrowserMob Proxy", BrowserMobProxyUtil.getVersionString());
+    private volatile HarNameVersion creator  = new HarNameVersion("BrowserMob Proxy", BrowserMobProxyUtil.getVersionString());
     private volatile HarNameVersion browser;
     private List<HarPage> pages = new CopyOnWriteArrayList<HarPage>();
     private List<HarEntry> entries = new CopyOnWriteArrayList<HarEntry>();

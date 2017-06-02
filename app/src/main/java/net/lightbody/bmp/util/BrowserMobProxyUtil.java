@@ -7,12 +7,10 @@ import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.core.har.HarPage;
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,11 +31,6 @@ public class BrowserMobProxyUtil {
     private static final String UNKNOWN_VERSION_STRING = "UNKNOWN-VERSION";
 
     /**
-     * Singleton User Agent parser.
-     */
-    private static volatile UserAgentStringParser parser;
-
-    /**
      * Singleton version string loader.
      */
     private static final Supplier<String> version = Suppliers.memoize(new Supplier<String>() {
@@ -46,27 +39,6 @@ public class BrowserMobProxyUtil {
             return readVersionFileOnClasspath();
         }
     });
-
-    private static final Object PARSER_INIT_LOCK = new Object();
-
-    /**
-     * Retrieve the User Agent String Parser. Create the parser if it has not yet been initialized.
-     * 
-     * @return singleton UserAgentStringParser object
-     */
-    public static UserAgentStringParser getUserAgentStringParser() {
-        if (parser == null) {
-            synchronized (PARSER_INIT_LOCK) {
-                if (parser == null) {
-                    // using resourceModuleParser for now because user-agent-string.info no longer exists. the updating
-                    // parser will get incorrect data and wipe out its entire user agent repository.
-                    parser = UADetectorServiceFactory.getResourceModuleParser();
-                }
-            }
-        }
-
-        return parser;
-    }
 
     /**
      * Copies {@link HarEntry} and {@link HarPage} references from the specified har to a new har copy, up to and including
@@ -136,7 +108,7 @@ public class BrowserMobProxyUtil {
     private static String readVersionFileOnClasspath() {
         String versionString;
         try {
-            versionString = ClasspathResourceUtil.classpathResourceToString(VERSION_CLASSPATH_RESOURCE, Charset.forName("UTF-8"));
+            versionString = ClasspathResourceUtil.classpathResourceToString(VERSION_CLASSPATH_RESOURCE, StandardCharsets.UTF_8);
         } catch (UncheckedIOException e) {
             log.debug("Unable to load version from classpath resource: {}", VERSION_CLASSPATH_RESOURCE, e);
             return UNKNOWN_VERSION_STRING;

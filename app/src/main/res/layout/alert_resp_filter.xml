@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="URL地址："/>
+
+        <EditText
+            android:id="@+id/et_origin_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:hint="填写需要注入的网址（模糊匹配），例如 \n/portal_indexv3.shtml"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="替换正则："/>
+
+        <EditText
+            android:id="@+id/et_regex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:hint="填写想要替换的字符串或正则表达式，例如：\n&#060;/head&#062;"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:text="替换内容："/>
+
+        <EditText
+            android:id="@+id/et_replace_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:hint="填写替换的结果，例如：\n&#060;script&#062;alert('hello')&#060;/script&#062;&#060;/head&#062;"/>
+    </LinearLayout>
+
+</LinearLayout>

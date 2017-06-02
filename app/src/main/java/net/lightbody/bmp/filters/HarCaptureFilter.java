@@ -1,39 +1,7 @@
 package net.lightbody.bmp.filters;
 
 import com.google.common.collect.ImmutableList;
-
-import net.lightbody.bmp.core.har.Har;
-import net.lightbody.bmp.core.har.HarCookie;
-import net.lightbody.bmp.core.har.HarEntry;
-import net.lightbody.bmp.core.har.HarNameValuePair;
-import net.lightbody.bmp.core.har.HarNameVersion;
-import net.lightbody.bmp.core.har.HarPostData;
-import net.lightbody.bmp.core.har.HarPostDataParam;
-import net.lightbody.bmp.core.har.HarRequest;
-import net.lightbody.bmp.core.har.HarResponse;
-import net.lightbody.bmp.exception.UnsupportedCharsetException;
-import net.lightbody.bmp.filters.support.HttpConnectTiming;
-import net.lightbody.bmp.filters.util.HarCaptureUtil;
-import net.lightbody.bmp.proxy.CaptureType;
-import net.lightbody.bmp.util.BrowserMobHttpUtil;
-
-import org.littleshoot.proxy.impl.ProxyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import cn.darkal.networkdiagnosis.Utils.DatatypeConverter;
+import com.google.common.io.BaseEncoding;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpContent;
@@ -46,6 +14,35 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.core.har.HarCookie;
+import net.lightbody.bmp.core.har.HarEntry;
+import net.lightbody.bmp.core.har.HarNameValuePair;
+import net.lightbody.bmp.core.har.HarPostData;
+import net.lightbody.bmp.core.har.HarPostDataParam;
+import net.lightbody.bmp.core.har.HarRequest;
+import net.lightbody.bmp.core.har.HarResponse;
+import net.lightbody.bmp.exception.UnsupportedCharsetException;
+import net.lightbody.bmp.filters.support.HttpConnectTiming;
+import net.lightbody.bmp.filters.util.HarCaptureUtil;
+import net.lightbody.bmp.proxy.CaptureType;
+import net.lightbody.bmp.util.BrowserMobHttpUtil;
+import org.littleshoot.proxy.impl.ProxyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
     private static final Logger log = LoggerFactory.getLogger(HarCaptureFilter.class);
@@ -204,7 +201,9 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
             harEntry.setResponse(defaultHarResponse);
 
             captureQueryParameters(httpRequest);
-            captureUserAgent(httpRequest);
+            // not capturing user agent: in many cases, it doesn't make sense to capture at the HarLog level, since the proxy could be
+            // serving requests from many different clients with various user agents. clients can turn on the REQUEST_HEADERS capture type
+            // in order to capture the User-Agent header, if desired.
             captureRequestHeaderSize(httpRequest);
 
             if (dataToCapture.contains(CaptureType.REQUEST_COOKIES)) {
@@ -321,8 +320,7 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
     protected void captureQueryParameters(HttpRequest httpRequest) {
         // capture query parameters. it is safe to assume the query string is UTF-8, since it "should" be in US-ASCII (a subset of UTF-8),
         // but sometimes does include UTF-8 characters.
-        QueryStringDecoder queryStringDecoder = null;
-        queryStringDecoder = new QueryStringDecoder(httpRequest.getUri(), Charset.forName("UTF-8"));
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httpRequest.getUri(), StandardCharsets.UTF_8);
 
         try {
             for (Map.Entry<String, List<String>> entry : queryStringDecoder.parameters().entrySet()) {
@@ -335,23 +333,6 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
             // fail by propagating the exception, simply skip the query parameter capture.
             harEntry.setComment("Unable to decode query parameters on URI: " + httpRequest.getUri());
             log.info("Unable to decode query parameters on URI: " + httpRequest.getUri(), e);
-        }
-    }
-
-    protected void captureUserAgent(HttpRequest httpRequest) {
-        // save the browser and version if it's not yet been set
-        if (har.getLog().getBrowser() == null) {
-            String userAgentHeader = HttpHeaders.getHeader(httpRequest, HttpHeaders.Names.USER_AGENT);
-            if (userAgentHeader != null && userAgentHeader.length() > 0) {
-                try {
-//                    ReadableUserAgent uai = BrowserMobProxyUtil.getUserAgentStringParser().parse(userAgentHeader);
-//                    String browser = uai.getName();
-//                    String version = uai.getVersionNumber().toVersionString();
-                    har.getLog().setBrowser(new HarNameVersion("Mozilla/5.0 (Linux; U; Android 4.3; zh-cn; R8007 Build/JLS36C) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30", "1.0.0"));
-                } catch (RuntimeException e) {
-                    log.warn("Failed to parse user agent string", e);
-                }
-            }
         }
     }
 
@@ -496,7 +477,7 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
             String text = BrowserMobHttpUtil.getContentAsString(fullMessage, charset);
             harEntry.getResponse().getContent().setText(text);
         } else if (dataToCapture.contains(CaptureType.RESPONSE_BINARY_CONTENT)) {
-            harEntry.getResponse().getContent().setText(new String(DatatypeConverter.parseBase64Binary(new String(fullMessage))));
+            harEntry.getResponse().getContent().setText(BaseEncoding.base64().encode(fullMessage));
             harEntry.getResponse().getContent().setEncoding("base64");
         }
 
@@ -782,7 +763,4 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
             harEntry.getTimings().setReceive(0L, TimeUnit.NANOSECONDS);
         }
     }
-
-
-
 }

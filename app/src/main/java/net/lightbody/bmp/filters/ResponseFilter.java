@@ -1,9 +1,8 @@
 package net.lightbody.bmp.filters;
 
+import io.netty.handler.codec.http.HttpResponse;
 import net.lightbody.bmp.util.HttpMessageContents;
 import net.lightbody.bmp.util.HttpMessageInfo;
-
-import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * A functional interface to simplify modification and manipulation of responses.

@@ -1,11 +1,13 @@
 package net.lightbody.bmp.core.har;
 
-import java.net.URLDecoder;
-import java.util.Date;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import net.lightbody.bmp.core.json.ISO8601WithTDZDateFormatter;
+
+import java.net.URLDecoder;
+import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HarCookie {

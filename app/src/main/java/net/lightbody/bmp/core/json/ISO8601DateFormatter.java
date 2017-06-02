@@ -16,7 +16,7 @@ public class ISO8601DateFormatter extends JsonSerializer<Date> {
     public final static ISO8601DateFormatter instance = new ISO8601DateFormatter();
 
     @Override
-    public void serialize(java.util.Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+    public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
         DateFormat df = (DateFormat) provider.getConfig().getDateFormat().clone();
         jgen.writeString(df.format(value));
     }

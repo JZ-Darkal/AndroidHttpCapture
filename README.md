@@ -18,38 +18,50 @@ Content内容如果为JSON将会自动格式化显示<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/230686663947787928.jpg&width=350)<br>
 分享功能将抓包生成的所有数据包打包为har文件并压缩为zip，支持分享到微信、QQ等<br><br>
 
-2． 环境切换<br>
+2． 返回包注入<br>
+支持修改流量返回包（该版本暂时只支持http的修改）<br>
+![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG180.jpeg&width=350)
+![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG181.jpeg&width=350)<br><br>
+
+3． 环境切换<br>
 支持切换模拟为微信、手Q，默认为普通浏览器。<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG81.jpeg&width=350)<br><br>
 
-3． 多样性输入：导航、地址栏、扫一扫、schema呼起<br>
+4． 多样性输入：导航、地址栏、扫一扫、schema呼起<br>
 支持地址栏直接输入地址，扫扫描二维码，以及schema呼起app并打开目标页面。<br>
 schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.darkal.cn'}<br><br>
 
-4． Host配置<br>
+5． Host配置<br>
 可以配置各域名的host<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG79.jpeg&width=350&t=1)<br><br>
 
 
-5． 查看console.log日志<br>
+6． 查看console.log日志<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG82.jpeg&width=350)<br><br>
 
 
-6． 网络工具<br>
+7． 网络工具<br>
 目前AndroidHttpCapture集成了常见的网络工具，如dns,ping,以及设备信息<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/621495078826.jpg&width=350)<br><br>
 
-7． 设置系统代理，监听其他app请求包<br>
+8． 设置系统代理，监听其他app请求包<br>
 当将用户手机的代理服务器设置为127.0.0.1:8888时，可以对其他app（例如微信）的HTTP数据进行抓包<br>
 （此时AndroidHttpCapture就是一个手机上的fiddler）<br>
 ![image](https://www.darkal.cn/imgd.php?src=/2016/09/WechatIMG80.jpeg&width=350)<br><br>
- 
+
 ### Q & A<br>
 1. 分享的http包如何查看和分析？<br>
     分享的文件解压后为.har文件,可以通过fiddler方式或者在线工具进行分析。<br>
     Fiddler方式需要先将包导到电脑上，然后使用fiddler导入该包：Import Sessions->Select Import Format ->HTTPArchive ->选择包，即可<br>
     在线工具外网：http://h5.darkal.cn/har/ 只需要将包拖入此工具即可分析<br><br>
-    
+
+### 已知BUG<br>
+1. 信任所有的服务器证书不做校验<br>
+2. 开启返回包注入功能后，https返回的部分页面存在 err_CONTENT_LENGTH_MISMATCH 错误<br>
+
+#### 如果觉得工具好用的话请多多star以及Pull requests<br>支持我喝杯咖啡请扫描下面的二维码，谢谢(ง •̀_•́)ง<br>
+![image](http://h5.darkal.cn/har/guide/img/code.jpg)<br><br>
+
 ### 致谢<br>
 AndroidHttpCapture基于Netty、browsermob-proxy来实现核心抓包的功能<br>
 Netty is an asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.<br>
@@ -58,8 +70,7 @@ https://github.com/netty/netty<br>
 
 A free utility to help web developers watch and manipulate network traffic from their AJAX applications.<br>
 https://github.com/lightbody/browsermob-proxy<br>
-修改了多处browsermob-proxy的源码适配Android系统<br>
-#### 目前遗留了一个Bug：信任所有的服务器证书不做校验<br><br>
+修改了多处browsermob-proxy的源码适配Android系统<br><br>
 
 MIT License<br>
 Copyright (c) 2016 AndroidHttpCapture

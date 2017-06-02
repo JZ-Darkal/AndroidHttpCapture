@@ -3,7 +3,10 @@ package net.lightbody.bmp;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
-
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
 import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarLog;
@@ -43,7 +46,6 @@ import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
 import net.lightbody.bmp.proxy.dns.DelegatingHostResolver;
 import net.lightbody.bmp.util.BrowserMobHttpUtil;
 import net.lightbody.bmp.util.BrowserMobProxyUtil;
-
 import org.littleshoot.proxy.ChainedProxy;
 import org.littleshoot.proxy.ChainedProxyAdapter;
 import org.littleshoot.proxy.ChainedProxyManager;
@@ -56,9 +58,12 @@ import org.littleshoot.proxy.MitmManager;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.littleshoot.proxy.impl.ThreadPoolConfiguration;
+import org.littleshoot.proxy.mitm.Authority;
+import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -78,11 +83,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * A LittleProxy-based implementation of {@link net.lightbody.bmp.BrowserMobProxy}.
@@ -203,6 +203,12 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     private final AtomicBoolean harCaptureFilterEnabled = new AtomicBoolean(false);
 
     /**
+     * Set to true when LittleProxy has been bootstrapped with the default chained proxy. This allows modifying the chained proxy
+     * after the proxy has been started.
+     */
+    private final AtomicBoolean bootstrappedWithDefaultChainedProxy = new AtomicBoolean(false);
+
+    /**
      * The address of an upstream chained proxy to route traffic through.
      */
     private volatile InetSocketAddress upstreamProxyAddress;
@@ -309,19 +315,24 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
 
 
         if (!mitmDisabled) {
-            if (mitmManager == null) {
-                mitmManager = ImpersonatingMitmManager.builder()
-                        .rootCertificateSource(new KeyStoreFileCertificateSource(
-                                KEYSTORE_TYPE,
-                                useEcc ? EC_KEYSTORE_RESOURCE : RSA_KEYSTORE_RESOURCE,
-                                KEYSTORE_PRIVATE_KEY_ALIAS,
-                                KEYSTORE_PASSWORD))
-                        .serverKeyGenerator(useEcc ? new ECKeyGenerator() : new RSAKeyGenerator())
-                        .trustSource(trustSource)
-                        .build();
-            }
+//            if (mitmManager == null) {
+//                mitmManager = ImpersonatingMitmManager.builder()
+//                        .rootCertificateSource(new KeyStoreFileCertificateSource(
+//                                KEYSTORE_TYPE,
+//                                useEcc ? EC_KEYSTORE_RESOURCE : RSA_KEYSTORE_RESOURCE,
+//                                KEYSTORE_PRIVATE_KEY_ALIAS,
+//                                KEYSTORE_PASSWORD))
+//                        .serverKeyGenerator(useEcc ? new ECKeyGenerator() : new RSAKeyGenerator())
+//                        .trustSource(trustSource)
+//                        .build();
+//            }
 
-            bootstrap.withManInTheMiddle(mitmManager);
+            try {
+                bootstrap.withManInTheMiddle(new CertificateSniffingMitmManager(
+                        new Authority()));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         if (readBandwidthLimitBps > 0 || writeBandwidthLimitBps > 0) {
@@ -331,6 +342,10 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
         if (chainedProxyManager != null) {
             bootstrap.withChainProxyManager(chainedProxyManager);
         } else if (upstreamProxyAddress != null) {
+            // indicate that the proxy was bootstrapped with the default chained proxy manager, which allows changing the
+            // chained proxy after the proxy is started.
+            bootstrappedWithDefaultChainedProxy.set(true);
+
             bootstrap.withChainProxyManager(new ChainedProxyManager() {
                 @Override
                 public void lookupChainedProxies(HttpRequest httpRequest, Queue<ChainedProxy> chainedProxies) {
@@ -465,9 +480,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
 
     @Override
     public Har newHar(String initialPageRef, String initialPageTitle) {
-        // eagerly initialize the User Agent String Parser, since it will be needed for the HAR
-//        BrowserMobPrzoxyUtil.getUserAgentStringParser();
-
         Har oldHar = getHar();
 
         addHarCaptureFilter();
@@ -544,7 +556,7 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
-    public synchronized Har newPage(String pageRef, String pageTitle) {
+    public Har newPage(String pageRef, String pageTitle) {
         if (har == null) {
             throw new IllegalStateException("No HAR exists for this proxy. Use newHar() to create a new HAR before calling newPage().");
         }
@@ -575,15 +587,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
         currentHarPage = newPage;
 
         return endOfPageHar;
-    }
-
-    @Override
-    public Boolean deletePage(HarPage harPage) {
-        if (har == null) {
-            throw new IllegalStateException("No HAR exists for this proxy. Use newHar() to create a new HAR before calling newPage().");
-        }
-
-        return har.getLog().deletePage(harPage);
     }
 
     @Override
@@ -883,15 +886,19 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     /**
-     * Instructs this proxy to route traffic through an upstream proxy. Proxy chaining is not compatible with man-in-the-middle
-     * SSL, so HAR capture will be disabled for HTTPS traffic when using an upstream proxy.
-     * <p>
-     * <b>Note:</b> Using {@link #setChainedProxyManager(ChainedProxyManager)} will supersede any value set by this method.
+     * Instructs this proxy to route traffic through an upstream proxy.
+     *
+     * <b>Note:</b> Using {@link #setChainedProxyManager(ChainedProxyManager)} will supersede any value set by this method. A chained
+     * proxy must be set before the proxy is started, though it can be changed after the proxy is started.
      *
      * @param chainedProxyAddress address of the upstream proxy
      */
     @Override
     public void setChainedProxy(InetSocketAddress chainedProxyAddress) {
+        if (isStarted() && !bootstrappedWithDefaultChainedProxy.get()) {
+            throw new IllegalStateException("Cannot set a chained proxy after the proxy is started if the proxy was started without a chained proxy.");
+        }
+
         upstreamProxyAddress = chainedProxyAddress;
     }
 
@@ -903,6 +910,8 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     /**
      * Allows access to the LittleProxy {@link ChainedProxyManager} for fine-grained control of the chained proxies. To enable a single
      * chained proxy, {@link BrowserMobProxy#setChainedProxy(InetSocketAddress)} is generally more convenient.
+     *
+     * <b>Note:</b> The chained proxy manager must be enabled before calling {@link #start()}.
      *
      * @param chainedProxyManager chained proxy manager to enable
      */
@@ -944,7 +953,8 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
      */
     @Override
     public void addResponseFilter(ResponseFilter filter) {
-        addLastHttpFilterFactory(new ResponseFilterAdapter.FilterSource(filter));
+        filterFactories.add(new ResponseFilterAdapter.FilterSource(filter));
+//        addLastHttpFilterFactory();
     }
 
     /**

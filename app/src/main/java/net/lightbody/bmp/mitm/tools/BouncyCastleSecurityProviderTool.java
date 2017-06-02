@@ -1,14 +1,12 @@
 package net.lightbody.bmp.mitm.tools;
 
 import com.google.common.net.InetAddresses;
-
 import net.lightbody.bmp.mitm.CertificateAndKey;
 import net.lightbody.bmp.mitm.CertificateInfo;
 import net.lightbody.bmp.mitm.exception.CertificateCreationException;
 import net.lightbody.bmp.mitm.exception.ExportException;
 import net.lightbody.bmp.mitm.exception.ImportException;
 import net.lightbody.bmp.mitm.util.EncryptionUtil;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -42,6 +40,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
+import javax.net.ssl.KeyManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -58,8 +57,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.KeyManager;
 
 public class BouncyCastleSecurityProviderTool implements SecurityProviderTool {
     static {
@@ -215,8 +212,7 @@ public class BouncyCastleSecurityProviderTool implements SecurityProviderTool {
 
     @Override
     public PrivateKey decodePemEncodedPrivateKey(Reader privateKeyReader, String password) {
-        try {
-            PEMParser pemParser = new PEMParser(privateKeyReader);
+        try (PEMParser pemParser = new PEMParser(privateKeyReader)) {
             Object keyPair = pemParser.readObject();
 
             // retrieve the PrivateKeyInfo from the returned keyPair object. if the key is encrypted, it needs to be
@@ -379,8 +375,7 @@ public class BouncyCastleSecurityProviderTool implements SecurityProviderTool {
     private static String encodeObjectAsPemString(Object object, PEMEncryptor encryptor) {
         StringWriter stringWriter = new StringWriter();
 
-        try {
-            JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter);
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter)) {
             pemWriter.writeObject(object, encryptor);
             pemWriter.flush();
         } catch (IOException e) {

@@ -29,6 +29,10 @@
             android:title="高级功能">
             <menu>
                 <item
+                    android:id="@+id/nav_modify"
+                    android:icon="@drawable/ic_mode_edit_black_24dp"
+                    android:title="返回包注入" />
+                <item
                     android:id="@+id/nav_ua"
                     android:icon="@drawable/ic_style_black_24dp"
                     android:title="环境切换" />

@@ -291,7 +291,7 @@ public class ImpersonatingMitmManager implements MitmManager {
         // to impersonate the real upstream server, and will use the private key to encrypt the channel.
         KeyPair serverKeyPair = serverKeyGenerator.generate();
 
-        // get the CA root certificate and private key that will be used to sign the forced certificate
+        // get the CA root certificate and private key that will be used to sign the forged certificate
         X509Certificate caRootCertificate = rootCertificate.get().getCertificate();
         PrivateKey caPrivateKey = rootCertificate.get().getPrivateKey();
         if (caRootCertificate == null || caPrivateKey == null) {

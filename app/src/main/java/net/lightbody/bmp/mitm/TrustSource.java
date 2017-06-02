@@ -7,7 +7,7 @@ import net.lightbody.bmp.mitm.util.TrustUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -174,7 +174,7 @@ public class TrustSource {
 
         String pemFileContents;
         try {
-            pemFileContents = Files.toString(trustedCAPemFile, Charset.forName("UTF-8"));
+            pemFileContents = Files.toString(trustedCAPemFile, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException("Unable to read file containing PEM-encoded trusted CAs: " + trustedCAPemFile.getAbsolutePath(), e);
         }

@@ -2,19 +2,20 @@ package net.lightbody.bmp.mitm.util;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-
 import net.lightbody.bmp.mitm.exception.KeyStoreAccessException;
 import net.lightbody.bmp.mitm.exception.TrustSourceException;
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
 import net.lightbody.bmp.mitm.tools.DefaultSecurityProviderTool;
 import net.lightbody.bmp.mitm.tools.SecurityProviderTool;
 import net.lightbody.bmp.util.ClasspathResourceUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.StringReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -26,10 +27,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Utility class for interacting with the default trust stores on this JVM.
@@ -84,7 +81,7 @@ public class TrustUtil {
         public X509Certificate[] get() {
             try {
                 // the file may contain UTF-8 characters, but the PEM-encoded certificate data itself must be US-ASCII
-                String allCAs = ClasspathResourceUtil.classpathResourceToString(DEFAULT_TRUSTED_CA_RESOURCE, Charset.forName("UTF-8"));
+                String allCAs = ClasspathResourceUtil.classpathResourceToString(DEFAULT_TRUSTED_CA_RESOURCE, StandardCharsets.UTF_8);
 
                 return readX509CertificatesFromPem(allCAs);
             } catch (UncheckedIOException e) {

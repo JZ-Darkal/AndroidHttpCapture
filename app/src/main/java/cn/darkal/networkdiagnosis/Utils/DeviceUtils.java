@@ -6,9 +6,24 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.filters.RequestFilter;
+import net.lightbody.bmp.filters.ResponseFilter;
 import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
+import net.lightbody.bmp.util.HttpMessageContents;
+import net.lightbody.bmp.util.HttpMessageInfo;
 
+import org.littleshoot.proxy.HttpFilters;
+import org.littleshoot.proxy.HttpFiltersSource;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+
+import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.SysApplication;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * Created by Darkal on 2016/9/21.
@@ -66,5 +81,29 @@ public class DeviceUtils {
             }
         }
         browserMobProxy.setHostNameResolver(advancedHostResolver);
+    }
+
+    public static void changeResponseFilter(SysApplication sysApplication,final List<ResponseFilterRule> ruleList){
+        if(ruleList == null){
+            Log.e("~~~~","changeResponseFilter ruleList == null!");
+            return;
+        }
+
+        sysApplication.proxy.addResponseFilter(new ResponseFilter() {
+            @Override
+            public void filterResponse(HttpResponse response, HttpMessageContents contents, HttpMessageInfo messageInfo) {
+                for (ResponseFilterRule rule: ruleList) {
+                    if(rule.getEnable()) {
+                        if (contents.isText() && messageInfo.getUrl().contains(rule.getUrl())) {
+                            String originContent = contents.getTextContents();
+                            if (originContent != null) {
+                                contents.setTextContents(contents.getTextContents().replaceAll(
+                                        rule.getReplaceRegex(), rule.getReplaceContent()));
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }

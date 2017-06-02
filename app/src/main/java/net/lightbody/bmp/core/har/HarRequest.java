@@ -68,7 +68,7 @@ public class HarRequest {
     }
 
     public void setPostData(HarPostData postData) {
-            this.postData = postData;
+        this.postData = postData;
     }
 
     public long getHeadersSize() {

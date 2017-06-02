@@ -12,6 +12,12 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_UA" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="enable_filter"
+        android:title="启用返回包注入"
+        android:summary="注意：当前版本启用该功能会影响HTTPS请求的返回，修改该选项需要重启应用后生效"/>
+
 
     <EditTextPreference
         android:key="system_host"

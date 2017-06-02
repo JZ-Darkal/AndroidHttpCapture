@@ -9,10 +9,12 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.security.KeyChain;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -54,10 +56,13 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarPage;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,7 +73,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.darkal.networkdiagnosis.Adapter.FilterAdpter;
+import cn.darkal.networkdiagnosis.Adapter.PageFilterAdapter;
 import cn.darkal.networkdiagnosis.Bean.PageBean;
 import cn.darkal.networkdiagnosis.Fragment.BaseFragment;
 import cn.darkal.networkdiagnosis.Fragment.BackHandledInterface;
@@ -90,8 +95,8 @@ import cn.darkal.networkdiagnosis.View.LoadingDialog;
 public class MainActivity extends AppCompatActivity implements BackHandledInterface {
     public final static String CODE_URL = "#";
     public final static String UPLOAD_URL = "#";
-    public final static String HOME_URL = "http://h5.darkal.cn/har/guide/widget.basic.html";
-    public final static String GUIDE_URL = "http://h5.darkal.cn/har/guide/widget.guide.html";
+    public final static String HOME_URL = "http://h5.darkal.cn/har/guide/widget.basic2.html";
+    public final static String GUIDE_URL = "http://h5.darkal.cn/har/guide/widget.guide2.html";
 
     public final static int TYPE_NONE = 0;
     public final static int TYPE_SHARE = 1;
@@ -137,9 +142,15 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public Set<String> disablePages = new HashSet<>();
     public StringBuffer consoleLog = new StringBuffer();
 
+    public SharedPreferences shp;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        shp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         installCert();
 
         setContentView(R.layout.activity_main);
@@ -381,6 +392,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                 startActivity(intent);
             } else if (id == R.id.nav_ua) {
                 showUaDialog();
+            } else if (id == R.id.nav_modify) {
+                if(shp.getBoolean("enable_filter", false)) {
+                    Intent intent = new Intent(MainActivity.this, ChangeFilterActivity.class);
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(MainActivity.this, "请前往设置启用注入功能", Toast.LENGTH_LONG).show();
+                }
             } else if (id == R.id.nav_cosole) {
                 showLogDialog();
             } else if (id == R.id.nav_host) {
@@ -441,16 +459,22 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     }
 
     public void installCert() {
-        final String CERTIFICATE_RESOURCE = "/sslSupport/ca-certificate-rsa.cer";
+        final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
         Boolean isInstallCert = SharedPreferenceUtils.getBoolean(this, "isInstallCert", false);
 
         if (!isInstallCert) {
             Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
             try {
                 byte[] keychainBytes;
-                InputStream bis = MainActivity.class.getResourceAsStream(CERTIFICATE_RESOURCE);
-                keychainBytes = new byte[bis.available()];
-                bis.read(keychainBytes);
+
+                FileInputStream is = null;
+                try {
+                    is = new FileInputStream(CERTIFICATE_RESOURCE);
+                    keychainBytes = new byte[is.available()];
+                    is.read(keychainBytes);
+                } finally {
+                    IOUtils.closeQuietly(is);
+                }
 
                 Intent intent = KeyChain.createInstallIntent();
                 intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
@@ -785,7 +809,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
             pageBeenList.add(pageBean);
         }
 
-        listView.setAdapter(new FilterAdpter(pageBeenList));
+        listView.setAdapter(new PageFilterAdapter(pageBeenList));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(true);

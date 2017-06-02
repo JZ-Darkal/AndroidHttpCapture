@@ -5,6 +5,7 @@ import net.lightbody.bmp.mitm.exception.ImportException;
 
 import org.apache.commons.io.FileUtils;
 
+import javax.crypto.Cipher;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,8 +16,6 @@ import java.security.interfaces.DSAKey;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.util.Random;
-
-import javax.crypto.Cipher;
 
 /**
  * A collection of simple JCA-related utilities.
