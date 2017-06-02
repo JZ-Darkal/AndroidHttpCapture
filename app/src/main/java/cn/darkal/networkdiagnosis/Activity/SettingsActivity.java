@@ -228,7 +228,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 3) {
             if (resultCode == Activity.RESULT_OK) {
-                SharedPreferenceUtils.putBoolean(this, "isInstallCert", true);
+                SharedPreferenceUtils.putBoolean(this, "isInstallNewCert", true);
                 Toast.makeText(this, "安装成功", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "安装失败", Toast.LENGTH_LONG).show();

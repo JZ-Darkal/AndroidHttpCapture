@@ -460,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
     public void installCert() {
         final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
-        Boolean isInstallCert = SharedPreferenceUtils.getBoolean(this, "isInstallCert", false);
+        Boolean isInstallCert = SharedPreferenceUtils.getBoolean(this, "isInstallNewCert", false);
 
         if (!isInstallCert) {
             Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 3) {
             if (resultCode == Activity.RESULT_OK) {
-                SharedPreferenceUtils.putBoolean(this,"isInstallCert", true);
+                SharedPreferenceUtils.putBoolean(this,"isInstallNewCert", true);
                 Toast.makeText(this, "安装成功", Toast.LENGTH_LONG).show();
 
             } else {
