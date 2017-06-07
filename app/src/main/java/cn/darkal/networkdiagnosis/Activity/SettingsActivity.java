@@ -4,12 +4,7 @@ package cn.darkal.networkdiagnosis.Activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.ListPreference;
@@ -17,37 +12,24 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.security.KeyChain;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
 import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
-import cn.darkal.networkdiagnosis.Utils.FileUtil;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 import cn.darkal.networkdiagnosis.View.LoadingDialog;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -181,9 +163,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
         Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
         try {
             byte[] keychainBytes;
-            InputStream bis = MainActivity.class.getResourceAsStream(CERTIFICATE_RESOURCE);
-            keychainBytes = new byte[bis.available()];
-            bis.read(keychainBytes);
+            FileInputStream is = null;
+            try {
+                is = new FileInputStream(CERTIFICATE_RESOURCE);
+                keychainBytes = new byte[is.available()];
+                is.read(keychainBytes);
+            } finally {
+                IOUtils.closeQuietly(is);
+            }
 
             Intent intent = KeyChain.createInstallIntent();
             intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);

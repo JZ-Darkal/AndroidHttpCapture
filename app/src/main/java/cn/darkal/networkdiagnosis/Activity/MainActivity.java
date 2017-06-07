@@ -6,9 +6,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
@@ -110,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     private BaseFragment mBackHandedFragment;
     private long exitTime = 0;
 
+    private Receiver receiver;
+
     @BindView(R.id.fl_contain)
     public View rootView;
 
@@ -151,8 +155,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
         shp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        installCert();
-
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -160,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
         ButterKnife.bind(this);
         initFloatingActionMenu();
-
 
         OnGlobalLayoutListener globalLayoutListener = new OnGlobalLayoutListener(rootView);
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
@@ -583,7 +584,23 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     @Override
     protected void onStart() {
         super.onStart();
+        receiver = new Receiver();
+        registerReceiver(receiver, new IntentFilter("proxyfinished"));
         handleUriStartupParams();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(receiver);
+        super.onStop();
+    }
+
+    public class Receiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            installCert();
+            Log.i("~~~~", "Receiver installCert");
+        }
     }
 
     /**
