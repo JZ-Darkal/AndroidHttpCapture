@@ -1,0 +1,6 @@
+language: android
+android:
+  components:
+    - build-tools-24.0.3
+    - android-24
+    - extra
