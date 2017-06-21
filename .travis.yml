@@ -6,3 +6,8 @@ android:
     - android-24
     - extra-android-m2repository
     - extra-android-support
+before_script:
+    - wget http://services.gradle.org/distributions/gradle-2.14.1-all.zip
+    - unzip gradle-2.14.1-all.zip
+    - export GRADLE_HOME=$PWD/gradle-2.14.1
+    - export PATH=$GRADLE_HOME/bin:$PATH
