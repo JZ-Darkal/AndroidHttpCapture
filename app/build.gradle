@@ -16,6 +16,9 @@ android {
             storePassword '333333'
         }
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
     compileSdkVersion 24
     buildToolsVersion '24.0.3'
     dataBinding {
