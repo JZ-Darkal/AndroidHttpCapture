@@ -6,6 +6,7 @@ global_env: _JAVA_OPTIONS=-Xmx4g
 android:
   components:
     - build-tools-24.0.3
+    - android-22
     - android-24
     - extra-android-m2repository
     - extra-android-support
