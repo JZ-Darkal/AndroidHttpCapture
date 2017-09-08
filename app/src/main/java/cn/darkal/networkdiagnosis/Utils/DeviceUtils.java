@@ -80,6 +80,8 @@ public class DeviceUtils {
                 Log.e("~~~~remapHost ", temp.split(" ")[1] + " " + temp.split(" ")[0]);
             }
         }
+
+
         browserMobProxy.setHostNameResolver(advancedHostResolver);
     }
 

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -38,7 +39,7 @@ public class SysApplication extends MultiDexApplication {
     public static Boolean isInitProxy = false;
     public static int proxyPort = 8888;
     public BrowserMobProxy proxy;
-    public List<ResponseFilterRule> ruleList;
+    public List<ResponseFilterRule> ruleList = new ArrayList<>();
 
     @Override
     public void onCreate() {
