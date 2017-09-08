@@ -2,7 +2,7 @@ language: android
 jdk: oraclejdk8
 dist: trusty
 sudo: required
-global_env: _JAVA_OPTIONS=\"-Xmx4g\"
+global_env: _JAVA_OPTIONS=-Xmx4g
 
 android:
   components:
