@@ -3,6 +3,7 @@ apply plugin: 'android-apt'
 apply plugin: 'bugly'
 
 bugly {
+    upload =false
     appId = 'db9f598223' // 注册时分配的App ID
     appKey = '119ae85f-0c0b-485c-8ae2-da08e472b9e2' // 注册时分配的App Key
 }
