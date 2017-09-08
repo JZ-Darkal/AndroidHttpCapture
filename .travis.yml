@@ -2,6 +2,8 @@ language: android
 jdk: oraclejdk8
 dist: trusty
 sudo: required
+global_env: _JAVA_OPTIONS=\"-Xmx4g\"
+
 android:
   components:
     - build-tools-24.0.3
