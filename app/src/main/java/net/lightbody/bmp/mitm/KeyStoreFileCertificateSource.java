@@ -5,14 +5,15 @@ import com.google.common.base.Suppliers;
 import net.lightbody.bmp.mitm.exception.CertificateSourceException;
 import net.lightbody.bmp.mitm.tools.DefaultSecurityProviderTool;
 import net.lightbody.bmp.mitm.tools.SecurityProviderTool;
-
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStore;
 
 /**
@@ -119,21 +120,20 @@ public class KeyStoreFileCertificateSource implements CertificateAndKeySource {
             keyStore = securityProviderTool.loadKeyStore(keyStoreFile, keyStoreType, keyStorePassword);
         } else {
             // copy the classpath resource to a temporary file and load the keystore from that temp file
-            File tempKeyStoreFile = null;
-            try{
-                InputStream keystoreAsStream = KeyStoreFileCertificateSource.class.getResourceAsStream(keyStoreClasspathResource);
-                tempKeyStoreFile = File.createTempFile("keystore", "temp");
-                FileUtils.copyInputStreamToFile(keystoreAsStream, tempKeyStoreFile);
+            Path tempKeyStoreFile = null;
+            try (InputStream keystoreAsStream = KeyStoreFileCertificateSource.class.getResourceAsStream(keyStoreClasspathResource)) {
+                tempKeyStoreFile = Files.createTempFile("keystore", "temp");
+                Files.copy(keystoreAsStream, tempKeyStoreFile, StandardCopyOption.REPLACE_EXISTING);
 
-                keyStore = securityProviderTool.loadKeyStore(tempKeyStoreFile, keyStoreType, keyStorePassword);
+                keyStore = securityProviderTool.loadKeyStore(tempKeyStoreFile.toFile(), keyStoreType, keyStorePassword);
             } catch (IOException e) {
                 throw new CertificateSourceException("Unable to open KeyStore classpath resource: " + keyStoreClasspathResource, e);
             } finally {
                 if (tempKeyStoreFile != null) {
                     try {
-                        FileUtils.forceDelete(tempKeyStoreFile);
+                        Files.deleteIfExists(tempKeyStoreFile);
                     } catch (IOException e) {
-                        log.warn("Unable to delete temporary KeyStore file: {}.", tempKeyStoreFile.getAbsoluteFile());
+                        log.warn("Unable to delete temporary KeyStore file: {}.", tempKeyStoreFile.toAbsolutePath());
                     }
                 }
             }

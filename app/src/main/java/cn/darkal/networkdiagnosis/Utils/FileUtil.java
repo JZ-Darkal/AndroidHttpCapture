@@ -86,11 +86,11 @@ public class FileUtil {
     }
 
     /**
-     * 获取我们京致衣橱存储的目录
+     *
      */
     public static File getAppRoot() {
         try {
-            File root = new File(getDataRoot(), "com.jd.wxsq.app");
+            File root = new File(getDataRoot(), "com.darkal.nt");
             if (!root.exists()) {
                 root.mkdirs();
             }

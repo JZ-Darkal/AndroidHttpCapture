@@ -3,13 +3,12 @@ package net.lightbody.bmp.mitm.util;
 import net.lightbody.bmp.mitm.exception.ExportException;
 import net.lightbody.bmp.mitm.exception.ImportException;
 
-import org.apache.commons.io.FileUtils;
-
 import javax.crypto.Cipher;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.DSAKey;
@@ -90,7 +89,7 @@ public class EncryptionUtil {
      */
     public static void writePemStringToFile(File file, String pemDataToWrite) {
         try {
-            FileUtils.write(file, pemDataToWrite);
+            Files.write(file.toPath(), pemDataToWrite.getBytes(StandardCharsets.US_ASCII));
         } catch (IOException e) {
             throw new ExportException("Unable to write PEM string to file: " + file.getName(), e);
         }
@@ -104,8 +103,8 @@ public class EncryptionUtil {
      */
     public static String readPemStringFromFile(File file) {
         try {
-            byte[] fileContents = FileUtils.readFileToByteArray(file);
-            return new String(fileContents, Charset.forName("US-ASCII"));
+            byte[] fileContents = Files.readAllBytes(file.toPath());
+            return new String(fileContents, StandardCharsets.US_ASCII);
         } catch (IOException e) {
             throw new ImportException("Unable to read PEM-encoded data from file: " + file.getName());
         }

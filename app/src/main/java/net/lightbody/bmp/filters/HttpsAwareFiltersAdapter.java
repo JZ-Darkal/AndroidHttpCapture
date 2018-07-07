@@ -102,7 +102,7 @@ public class HttpsAwareFiltersAdapter extends HttpFiltersAdapter {
         String serverHost;
         if (isHttps()) {
             HostAndPort hostAndPort = HostAndPort.fromString(getHttpsRequestHostAndPort());
-            serverHost = hostAndPort.getHostText();
+            serverHost = hostAndPort.getHost();
         } else {
             serverHost = HttpUtil.getHostFromRequest(modifiedRequest);
         }

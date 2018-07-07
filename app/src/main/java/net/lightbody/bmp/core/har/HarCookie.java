@@ -2,9 +2,6 @@ package net.lightbody.bmp.core.har;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import net.lightbody.bmp.core.json.ISO8601WithTDZDateFormatter;
 
 import java.net.URLDecoder;
 import java.util.Date;
@@ -32,10 +29,10 @@ public class HarCookie {
         return value;
     }
 
-    public String getDecodeValue() {
-        try{
+    public String getDecodeValue(){
+        try {
             return URLDecoder.decode(value);
-        }catch (Exception e) {
+        }catch (Exception e){
             return value;
         }
     }
@@ -60,7 +57,7 @@ public class HarCookie {
         this.domain = domain;
     }
 
-    @JsonSerialize(using = ISO8601WithTDZDateFormatter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     public Date getExpires() {
         return expires;
     }

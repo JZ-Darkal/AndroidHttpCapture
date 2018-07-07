@@ -174,7 +174,7 @@ public class TrustSource {
 
         String pemFileContents;
         try {
-            pemFileContents = Files.toString(trustedCAPemFile, StandardCharsets.UTF_8);
+            pemFileContents = Files.asCharSource(trustedCAPemFile, StandardCharsets.UTF_8).read();
         } catch (IOException e) {
             throw new UncheckedIOException("Unable to read file containing PEM-encoded trusted CAs: " + trustedCAPemFile.getAbsolutePath(), e);
         }

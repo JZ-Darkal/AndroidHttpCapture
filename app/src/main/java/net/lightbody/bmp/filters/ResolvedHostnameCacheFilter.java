@@ -53,7 +53,7 @@ public class ResolvedHostnameCacheFilter extends HttpFiltersAdapter {
         if (resolvedAddress != null) {
             // place the resolved host into the hostname cache, so subsequent requests will be able to identify the IP address
             HostAndPort parsedHostAndPort = HostAndPort.fromString(serverHostAndPort);
-            String host = parsedHostAndPort.getHostText();
+            String host = parsedHostAndPort.getHost();
 
             if (host != null && !host.isEmpty()) {
                 resolvedAddresses.put(host, resolvedAddress.getHostAddress());

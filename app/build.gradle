@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 apply plugin: 'bugly'
 
 bugly {
@@ -20,17 +19,17 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    compileSdkVersion 24
-    buildToolsVersion '24.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     dataBinding {
         enabled = true
     }
     defaultConfig {
         applicationId "cn.darkal.networkdiagnosis"
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 30
-        versionName "3.1.30"
+        versionName "3.2.31"
         // Enabling multidex support.
         multiDexEnabled true
         resConfigs "zh"
@@ -70,50 +69,54 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
-    compile 'com.jakewharton:butterknife:8.2.1'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.android.support:gridlayout-v7:24.2.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'com.android.databinding:library:3.1.3'
+    implementation 'com.android.databinding:adapters:3.1.3'
+    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:gridlayout-v7:27.1.1'
     //    compile 'com.android.support:cardview-v7:24.0.0'
-    compile 'com.android.support:support-annotations:24.2.1'
-    compile 'com.android.support:multidex:1.0.1'
+    implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'com.android.support:multidex:1.0.3'
     // littleproxy及其依赖
-    compile('net.lightbody.bmp:littleproxy:1.1.0-beta-bmp-16') {
+    implementation('net.lightbody.bmp:littleproxy:1.1.0-beta-bmp-17') {
         exclude group: 'io.netty'
     }
+    implementation 'com.jcraft:jzlib:1.1.3'
 
-    compile group: 'org.apache.directory.studio', name: 'org.apache.commons.io', version: '2.4'
-    compile 'javax.annotation:jsr250-api:1.0'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.6'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.6'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.6'
-    compile 'org.bouncycastle:bcprov-jdk15on:1.54'
-    compile 'org.bouncycastle:bcpkix-jdk15on:1.54'
-    compile 'dnsjava:dnsjava:2.1.7'
-    compile 'com.google.guava:guava:19.0'
-    compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.jimfs:jimfs:1.1'
-    compile 'com.jcraft:jzlib:1.1.3'
+
+    implementation group: 'org.apache.directory.studio', name: 'org.apache.commons.io', version: '2.4'
+    implementation 'javax.annotation:jsr250-api:1.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.7.6'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.7.6'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.7.6'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.54'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.54'
+    implementation 'dnsjava:dnsjava:2.1.7'
+    implementation 'com.google.guava:guava:19.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.1'
+    implementation 'com.google.jimfs:jimfs:1.1'
+    implementation 'com.jcraft:jzlib:1.1.3'
     // 日志处理
 //    compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'org.slf4j:slf4j-log4j12:1.7.21'
+    implementation 'org.slf4j:slf4j-log4j12:1.7.21'
 
     //    compile 'org.slf4j:jcl-over-slf4j:1.7.21'
     // 启用Netty的日志输出（调试用）
 //    compile 'com.noveogroup.android:android-logger:1.3.5'
     // 文件上传插件
-    compile 'net.gotev:uploadservice:3.0.3'
+    implementation 'net.gotev:uploadservice:3.0.3'
     // Bugly上报
-    compile 'com.tencent.bugly:crashreport_upgrade:latest.release'
+    implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     //    compile 'com.tencent.bugly:nativecrashreport:latest.release'
     // 图片显示
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.github.clans:fab:1.6.4'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.github.clans:fab:1.6.4'
     // Json格式化
-    compile 'com.google.code.gson:gson:2.7'
+    implementation 'com.google.code.gson:gson:2.7'
 }

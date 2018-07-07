@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 /**
@@ -82,27 +83,32 @@ public class BrowserMobHttpUtil {
      * @return decompressed bytes
      * @throws DecompressionException thrown if the fullMessage cannot be read or decompressed for any reason
      */
-    public static byte[] decompressContents(byte[] fullMessage) throws DecompressionException {
-        InflaterInputStream gzipReader = null;
+    public static byte[] decompressContents(byte[] fullMessage,String type) throws DecompressionException {
+        InflaterInputStream reader = null;
         ByteArrayOutputStream uncompressed;
         try {
-            gzipReader = new GZIPInputStream(new ByteArrayInputStream(fullMessage));
+            if(type.equalsIgnoreCase(HttpHeaders.Values.GZIP)) {
+                reader = new GZIPInputStream(new ByteArrayInputStream(fullMessage));
+            }else if(type.equalsIgnoreCase(HttpHeaders.Values.DEFLATE)) {
+                reader = new InflaterInputStream(new ByteArrayInputStream(fullMessage), new Inflater(true));
+            }
 
             uncompressed = new ByteArrayOutputStream(fullMessage.length);
-
             byte[] decompressBuffer = new byte[DECOMPRESS_BUFFER_SIZE];
             int bytesRead;
-            while ((bytesRead = gzipReader.read(decompressBuffer)) > -1) {
+            while ((bytesRead = reader.read(decompressBuffer)) > -1) {
                 uncompressed.write(decompressBuffer, 0, bytesRead);
             }
 
             fullMessage = uncompressed.toByteArray();
+
+
         } catch (IOException e) {
             throw new DecompressionException("Unable to decompress response", e);
         } finally {
             try {
-                if (gzipReader != null) {
-                    gzipReader.close();
+                if (reader != null) {
+                    reader.close();
                 }
             } catch (IOException e) {
                 log.warn("Unable to close gzip stream", e);
@@ -276,7 +282,7 @@ public class BrowserMobHttpUtil {
         HostAndPort parsedHostAndPort = HostAndPort.fromString(hostWithPort);
         if (parsedHostAndPort.hasPort() && parsedHostAndPort.getPort() == portNumber) {
             // HostAndPort.getHostText() strips brackets from ipv6 addresses, so reparse using fromHost
-            return HostAndPort.fromHost(parsedHostAndPort.getHostText()).toString();
+            return HostAndPort.fromHost(parsedHostAndPort.getHost()).toString();
         } else {
             return hostWithPort;
         }

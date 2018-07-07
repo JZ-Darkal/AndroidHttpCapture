@@ -63,7 +63,6 @@ import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -326,6 +325,8 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
 //                        .trustSource(trustSource)
 //                        .build();
 //            }
+//
+//            bootstrap.withManInTheMiddle(mitmManager);
 
             try {
                 bootstrap.withManInTheMiddle(new CertificateSniffingMitmManager(
@@ -953,8 +954,7 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
      */
     @Override
     public void addResponseFilter(ResponseFilter filter) {
-        filterFactories.add(new ResponseFilterAdapter.FilterSource(filter));
-//        addLastHttpFilterFactory();
+        addLastHttpFilterFactory(new ResponseFilterAdapter.FilterSource(filter));
     }
 
     /**

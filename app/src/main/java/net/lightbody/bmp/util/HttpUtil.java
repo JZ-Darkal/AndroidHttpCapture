@@ -114,7 +114,7 @@ public class HttpUtil {
                 return hostAndPort;
             } else {
                 HostAndPort parsedHostAndPort = HostAndPort.fromString(hostAndPort);
-                return parsedHostAndPort.getHostText();
+                return parsedHostAndPort.getHost();
             }
         } else {
             return null;

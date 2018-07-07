@@ -3,9 +3,6 @@ package net.lightbody.bmp.core.har;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import net.lightbody.bmp.core.json.ISO8601WithTDZDateFormatter;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +35,7 @@ public class HarEntry {
         this.pageref = pageref;
     }
 
-    @JsonSerialize(using = ISO8601WithTDZDateFormatter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     public Date getStartedDateTime() {
         return startedDateTime;
     }

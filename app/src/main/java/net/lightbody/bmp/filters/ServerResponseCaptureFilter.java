@@ -126,14 +126,14 @@ public class ServerResponseCaptureFilter extends HttpFiltersAdapter {
     }
 
     protected void decompressContents() {
-        if (contentEncoding.equals(HttpHeaders.Values.GZIP)) {
+        if (contentEncoding.equalsIgnoreCase(HttpHeaders.Values.GZIP) || contentEncoding.equalsIgnoreCase(HttpHeaders.Values.DEFLATE)) {
             try {
-                fullResponseContents = BrowserMobHttpUtil.decompressContents(getRawResponseContents());
+                fullResponseContents = BrowserMobHttpUtil.decompressContents(getRawResponseContents(),contentEncoding);
                 decompressionSuccessful = true;
             } catch (RuntimeException e) {
                 log.warn("Failed to decompress response with encoding type " + contentEncoding + " when decoding request from " + originalRequest.getUri(), e);
             }
-        } else {
+        }  else{
             log.warn("Cannot decode unsupported content encoding type {}", contentEncoding);
         }
     }
