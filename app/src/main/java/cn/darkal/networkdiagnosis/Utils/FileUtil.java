@@ -443,7 +443,7 @@ public class FileUtil {
         }catch (Exception e){}
     }
 
-    public static void checkPermission(Activity activity) {
+    public static void checkPermission(Activity activity,Runnable runnable) {
         //检查权限（NEED_PERMISSION）是否被授权 PackageManager.PERMISSION_GRANTED表示同意授权
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -454,9 +454,9 @@ public class FileUtil {
             }
             //申请权限
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
         } else {
-            Toast.makeText(activity, "授权成功！", Toast.LENGTH_SHORT).show();
+            runnable.run();
+//            Toast.makeText(activity, "授权成功！", Toast.LENGTH_SHORT).show();
         }
     }
 

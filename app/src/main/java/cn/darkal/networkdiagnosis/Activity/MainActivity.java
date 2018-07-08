@@ -375,35 +375,47 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                 Toast.makeText(MainActivity.this, "请等待程序初始化完成", Toast.LENGTH_LONG).show();
                 return true;
             }
-            if (id == R.id.nav_camera) {
-                Intent intent = new Intent(MainActivity.this, QrCodeScanActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_gallery) {
-                switchContent(WebViewFragment.getInstance());
-            }
-//            else if (id == R.id.nav_preview) {
-//                switchContent(PreviewFragment.getInstance());
-//            }
-            else if (id == R.id.nav_slideshow) {
-                switchContent(NetworkFragment.getInstance());
-            } else if (id == R.id.nav_manage) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_ua) {
-                showUaDialog();
-            } else if (id == R.id.nav_modify) {
-                if(shp.getBoolean("enable_filter", false)) {
-                    Intent intent = new Intent(MainActivity.this, ChangeFilterActivity.class);
+
+            switch (id) {
+                case R.id.nav_camera: {
+                    Intent intent = new Intent(MainActivity.this, QrCodeScanActivity.class);
                     startActivity(intent);
-                }else {
-                    Toast.makeText(MainActivity.this, "请前往设置启用注入功能", Toast.LENGTH_LONG).show();
+                    break;
                 }
-            } else if (id == R.id.nav_cosole) {
-                showLogDialog();
-            } else if (id == R.id.nav_host) {
-                showHostDialog();
-            } else if (id == R.id.nav_page) {
-                createPage();
+                case R.id.nav_gallery:
+                    switchContent(WebViewFragment.getInstance());
+                    break;
+                case R.id.nav_preview:
+                    switchContent(PreviewFragment.getInstance());
+                    break;
+                case R.id.nav_slideshow:
+                    switchContent(NetworkFragment.getInstance());
+                    break;
+                case R.id.nav_manage: {
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                case R.id.nav_ua:
+                    showUaDialog();
+                    break;
+                case R.id.nav_modify:
+                    if (shp.getBoolean("enable_filter", false)) {
+                        Intent intent = new Intent(MainActivity.this, ChangeFilterActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "请前往设置启用注入功能", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                case R.id.nav_cosole:
+                    showLogDialog();
+                    break;
+                case R.id.nav_host:
+                    showHostDialog();
+                    break;
+                case R.id.nav_page:
+                    createPage();
+                    break;
             }
 
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -461,28 +473,34 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
         Boolean isInstallCert = SharedPreferenceUtils.getBoolean(this, "isInstallNewCert", false);
 
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    byte[] keychainBytes;
+
+                    FileInputStream is = null;
+                    try {
+                        is = new FileInputStream(CERTIFICATE_RESOURCE);
+                        keychainBytes = new byte[is.available()];
+                        is.read(keychainBytes);
+                    } finally {
+                        IOUtils.closeQuietly(is);
+                    }
+
+                    Intent intent = KeyChain.createInstallIntent();
+                    intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
+                    intent.putExtra(KeyChain.EXTRA_NAME, "NetworkDiagnosis CA Certificate");
+                    startActivityForResult(intent, 3);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
         if (!isInstallCert) {
             Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
-            FileUtil.checkPermission(this);
-            try {
-                byte[] keychainBytes;
-
-                FileInputStream is = null;
-                try {
-                    is = new FileInputStream(CERTIFICATE_RESOURCE);
-                    keychainBytes = new byte[is.available()];
-                    is.read(keychainBytes);
-                } finally {
-                    IOUtils.closeQuietly(is);
-                }
-
-                Intent intent = KeyChain.createInstallIntent();
-                intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
-                intent.putExtra(KeyChain.EXTRA_NAME, "NetworkDiagnosis CA Certificate");
-                startActivityForResult(intent, 3);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            FileUtil.checkPermission(this,runnable);
         }
     }
 
@@ -642,42 +660,49 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
     public void createZip(final Runnable callback) {
         showLoading("打包中");
-        FileUtil.checkPermission(this);
-        new Thread(new Runnable() {
+
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                try {
-                    final Har har = getFiltedHar();
-                    final File saveHarFile = new File(Environment.getExternalStorageDirectory() + "/har/test.har");
-                    har.writeTo(saveHarFile);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            final Har har = getFiltedHar();
+                            final File saveHarFile = new File(Environment.getExternalStorageDirectory() + "/har/test.har");
+                            har.writeTo(saveHarFile);
 
-                    ZipUtils.zip(Environment.getExternalStorageDirectory() + "/har",
-                            Environment.getExternalStorageDirectory() + "/test.zip");
+                            ZipUtils.zip(Environment.getExternalStorageDirectory() + "/har",
+                                    Environment.getExternalStorageDirectory() + "/test.zip");
 
-                    rootView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(rootView, "HAR文件已保存至" + saveHarFile.getPath() + " 共计："
-                                    + har.getLog().getEntries().size() + "个请求", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
+                            rootView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Snackbar.make(rootView, "HAR文件已保存至" + saveHarFile.getPath() + " 共计："
+                                            + har.getLog().getEntries().size() + "个请求", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+                                }
+                            });
+
+                            MainActivity.this.runOnUiThread(callback);
+                        } catch (Exception e) {
+                            rootView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Snackbar.make(rootView, "HAR文件保存失败", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                                }
+                            });
+                            CrashReport.postCatchedException(e);
+                            e.printStackTrace();
+                        } finally {
+                            dismissLoading();
                         }
-                    });
-
-                    MainActivity.this.runOnUiThread(callback);
-                } catch (Exception e) {
-                    rootView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Snackbar.make(rootView, "HAR文件保存失败", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                        }
-                    });
-                    CrashReport.postCatchedException(e);
-                    e.printStackTrace();
-                } finally {
-                    dismissLoading();
-                }
+                    }
+                }).start();
             }
-        }).start();
+        };
+
+        FileUtil.checkPermission(this,runnable);
     }
 
     public void shareZip() {

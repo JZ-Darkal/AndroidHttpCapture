@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -43,9 +44,12 @@ public class ChangeFilterActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setupActionBar();
 
-        List<ResponseFilterRule> ruleList = ((SysApplication)getApplication()).ruleList;
+        if(((SysApplication)getApplication()).ruleList == null){
+            contentFilterAdapter = new ContentFilterAdapter(this,new ArrayList<ResponseFilterRule>());
+        }else{
+            contentFilterAdapter = new ContentFilterAdapter(this,((SysApplication)getApplication()).ruleList);
+        }
 
-        contentFilterAdapter = new ContentFilterAdapter(this,ruleList);
         listView.setAdapter(contentFilterAdapter);
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {

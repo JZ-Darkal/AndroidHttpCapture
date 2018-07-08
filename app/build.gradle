@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 
-
 android {
     signingConfigs {
         NetworkDiagnosis {
@@ -22,7 +21,7 @@ android {
         applicationId "cn.darkal.networkdiagnosis"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 30
+        versionCode 31
         versionName "3.2.31"
         // Enabling multidex support.
         multiDexEnabled true

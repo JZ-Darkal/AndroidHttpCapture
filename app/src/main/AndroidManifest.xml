@@ -31,10 +31,6 @@
         <meta-data
             android:name="BUGLY_APPID"
             android:value="db9f598223" />
-        <!-- 配置APP版本号 -->
-        <meta-data
-            android:name="BUGLY_APP_VERSION"
-            android:value="31" />
 
         <!-- 配置Bugly调试模式（true或者false）-->
         <meta-data

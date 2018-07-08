@@ -8,6 +8,11 @@
             android:title="浏览器" />
 
         <item
+            android:id="@+id/nav_preview"
+            android:icon="@drawable/ic_dns_black_24dp"
+            android:title="查看请求包" />
+
+        <item
             android:id="@+id/nav_camera"
             android:checkable="false"
             android:icon="@drawable/ic_menu_camera"

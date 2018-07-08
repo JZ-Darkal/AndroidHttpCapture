@@ -6,10 +6,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
-
-
-import com.tencent.bugly.crashreport.CrashReport;
-
+import com.tencent.bugly.Bugly;
 import net.gotev.uploadservice.UploadService;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -23,7 +20,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -48,7 +44,7 @@ public class SysApplication extends MultiDexApplication {
         // Gradle automatically generates proper variable as below.
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
-        CrashReport.initCrashReport(getApplicationContext(), "db9f598223", false);
+        Bugly.init(getApplicationContext(), "db9f598223", false);
     }
 
     public void initProxy() {

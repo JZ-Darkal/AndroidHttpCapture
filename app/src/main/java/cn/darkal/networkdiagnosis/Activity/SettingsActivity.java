@@ -163,26 +163,32 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
     public void installCert() {
         final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
         Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
-        FileUtil.checkPermission(this);
 
-        try {
-            byte[] keychainBytes;
-            FileInputStream is = null;
-            try {
-                is = new FileInputStream(CERTIFICATE_RESOURCE);
-                keychainBytes = new byte[is.available()];
-                is.read(keychainBytes);
-            } finally {
-                IOUtils.closeQuietly(is);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    byte[] keychainBytes;
+                    FileInputStream is = null;
+                    try {
+                        is = new FileInputStream(CERTIFICATE_RESOURCE);
+                        keychainBytes = new byte[is.available()];
+                        is.read(keychainBytes);
+                    } finally {
+                        IOUtils.closeQuietly(is);
+                    }
+
+                    Intent intent = KeyChain.createInstallIntent();
+                    intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
+                    intent.putExtra(KeyChain.EXTRA_NAME, "NetworkDiagnosis CA Certificate");
+                    startActivityForResult(intent, 3);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        };
 
-            Intent intent = KeyChain.createInstallIntent();
-            intent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychainBytes);
-            intent.putExtra(KeyChain.EXTRA_NAME, "NetworkDiagnosis CA Certificate");
-            startActivityForResult(intent, 3);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        FileUtil.checkPermission(this,runnable);
     }
 
     private LoadingDialog loadingDialog;

@@ -62,6 +62,9 @@ schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.dark
 #### 如果觉得工具好用的话请多多star以及Pull requests<br>支持我喝杯咖啡请扫描下面的二维码，谢谢(ง •̀_•́)ง<br>
 ![image](http://h5.darkal.cn/har/guide/img/code.jpg)<br><br>
 
+#### 相关技术交流可以加入QQ群：816839175<br>
+![image](http://h5.darkal.cn/har/guide/img/qq.jpg)<br><br>
+
 ### 致谢<br>
 AndroidHttpCapture基于Netty、browsermob-proxy来实现核心抓包的功能<br>
 Netty is an asynchronous event-driven network application framework for rapid development of maintainable high performance protocol servers & clients.<br>
