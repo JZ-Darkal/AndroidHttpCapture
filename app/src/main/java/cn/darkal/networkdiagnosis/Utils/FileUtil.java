@@ -1,11 +1,19 @@
 package cn.darkal.networkdiagnosis.Utils;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
+
+import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -433,5 +441,39 @@ public class FileUtil {
                 }
             }
         }catch (Exception e){}
+    }
+
+    public static void checkPermission(Activity activity) {
+        //检查权限（NEED_PERMISSION）是否被授权 PackageManager.PERMISSION_GRANTED表示同意授权
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            //用户已经拒绝过一次，再次弹出权限申请对话框需要给用户一个解释
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(activity, "请开通相关权限，否则无法正常使用本应用！", Toast.LENGTH_SHORT).show();
+            }
+            //申请权限
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+        } else {
+            Toast.makeText(activity, "授权成功！", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    public static void uploadFiles(Context context, UploadStatusDelegate uploadStatusDelegate, String serverUrlString, String paramNameString, String filesToUploadString) {
+        final String[] filesToUploadArray = filesToUploadString.split(",");
+
+        for (String fileToUploadPath : filesToUploadArray) {
+            try {
+                MultipartUploadRequest req = new MultipartUploadRequest(context, serverUrlString)
+                        .addFileToUpload(fileToUploadPath, paramNameString).setMethod("POST")
+                        .setMaxRetries(3);
+
+                req.setDelegate(uploadStatusDelegate).startUpload();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

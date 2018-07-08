@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
 import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
+import cn.darkal.networkdiagnosis.Utils.FileUtil;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 import cn.darkal.networkdiagnosis.View.LoadingDialog;
 
@@ -158,9 +159,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
     }
 
 
+
     public void installCert() {
         final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
         Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
+        FileUtil.checkPermission(this);
+
         try {
             byte[] keychainBytes;
             FileInputStream is = null;

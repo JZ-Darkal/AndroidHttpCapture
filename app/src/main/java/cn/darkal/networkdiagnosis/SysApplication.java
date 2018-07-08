@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
-import com.tencent.bugly.Bugly;
+
 import com.tencent.bugly.crashreport.CrashReport;
 
 import net.gotev.uploadservice.UploadService;
@@ -47,9 +47,8 @@ public class SysApplication extends MultiDexApplication {
         initProxy();
         // Gradle automatically generates proper variable as below.
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
-        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
-        strategy.setAppChannel("GitHub");
-        Bugly.init(getApplicationContext(), "db9f598223", true);
+
+        CrashReport.initCrashReport(getApplicationContext(), "db9f598223", false);
     }
 
     public void initProxy() {

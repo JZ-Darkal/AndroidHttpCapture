@@ -63,8 +63,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,7 +83,7 @@ import cn.darkal.networkdiagnosis.Fragment.WebViewFragment;
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
 import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
-import cn.darkal.networkdiagnosis.Utils.FileUtils;
+import cn.darkal.networkdiagnosis.Utils.FileUtil;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 import cn.darkal.networkdiagnosis.Utils.ZipUtils;
 import cn.darkal.networkdiagnosis.View.LoadingDialog;
@@ -465,6 +463,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
         if (!isInstallCert) {
             Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
+            FileUtil.checkPermission(this);
             try {
                 byte[] keychainBytes;
 
@@ -643,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
     public void createZip(final Runnable callback) {
         showLoading("打包中");
+        FileUtil.checkPermission(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -702,12 +702,12 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
     public class MyUploadDelegate implements UploadStatusDelegate {
         @Override
-        public void onProgress(UploadInfo uploadInfo) {
+        public void onProgress(Context context, UploadInfo uploadInfo) {
             Log.e("~~~~", uploadInfo.getProgressPercent() + "");
         }
 
         @Override
-        public void onError(UploadInfo uploadInfo, Exception exception) {
+        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
             dismissLoading();
             Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             exception.printStackTrace();
@@ -715,7 +715,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         }
 
         @Override
-        public void onCompleted(UploadInfo uploadInfo, ServerResponse serverResponse) {
+        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
             try {
                 JSONObject jsonObject = new JSONObject(serverResponse.getBodyAsString());
                 if (jsonObject.getInt("errId") == 0) {
@@ -733,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         }
 
         @Override
-        public void onCancelled(UploadInfo uploadInfo) {
+        public void onCancelled(Context context, UploadInfo uploadInfo) {
             dismissLoading();
         }
     }
@@ -791,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                     public void run() {
                         String serverUrl = UPLOAD_URL + "?code=" + edtInput.getText() + "&os=Android&module=" + Build.MODEL.replace(" ", "") + "&key=" + key;
                         showLoading("上传中");
-                        FileUtils.uploadFiles(MainActivity.this, new MyUploadDelegate(), serverUrl, "upload", Environment.getExternalStorageDirectory() + "/test.zip");
+                        FileUtil.uploadFiles(MainActivity.this, new MyUploadDelegate(), serverUrl, "upload", Environment.getExternalStorageDirectory() + "/test.zip");
                     }
                 };
                 createZip(runnable);
