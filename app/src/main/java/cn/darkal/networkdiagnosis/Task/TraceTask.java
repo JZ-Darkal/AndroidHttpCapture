@@ -1,6 +1,11 @@
 package cn.darkal.networkdiagnosis.Task;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
 
 import com.netease.LDNetDiagnoService.LDNetDiagnoListener;
@@ -18,10 +23,9 @@ import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 public class TraceTask extends BaseTask  implements LDNetDiagnoListener {
     String url;
     TextView resultTextView;
-    Context context;
-    String result;
+    Activity context;
 
-    public TraceTask(Context context , String url, TextView resultTextView)  {
+    public TraceTask(Activity context , String url, TextView resultTextView)  {
         super(url, resultTextView);
         this.context = context;
         this.url = url;
@@ -37,15 +41,21 @@ public class TraceTask extends BaseTask  implements LDNetDiagnoListener {
         @Override
         public void run() {
             try{
-//                TraceRouteWithPing traceRouteWithPing = new TraceRouteWithPing(url, TraceTask.this);
-//                traceRouteWithPing.executeTraceRoute();
-                LDNetDiagnoService _netDiagnoService = new LDNetDiagnoService(context.getApplicationContext(),
-                        "NetworkDiagnosis", "网络诊断应用", DeviceUtils.getVersion(context), "",
-                        "", url, "", "",
-                        "", "", TraceTask.this);
-                // 设置是否使用JNIC 完成traceroute
-                _netDiagnoService.setIfUseJNICTrace(true);
-                _netDiagnoService.execute();
+                int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE);
+
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+                } else {
+//                    TraceRouteWithPing traceRouteWithPing = new TraceRouteWithPing(url, TraceTask.this);
+//                    traceRouteWithPing.executeTraceRoute();
+                    LDNetDiagnoService _netDiagnoService = new LDNetDiagnoService(context.getApplicationContext(),
+                            "NetworkDiagnosis", "网络诊断应用", DeviceUtils.getVersion(context), "",
+                            "", url, "", "",
+                            "", "", TraceTask.this);
+                    // 设置是否使用JNIC 完成traceroute
+                    _netDiagnoService.setIfUseJNICTrace(true);
+                    _netDiagnoService.execute();
+                }
             }
             catch (Exception e){
                 resultTextView.post(new updateResultRunnable(e.toString() + "\n"));

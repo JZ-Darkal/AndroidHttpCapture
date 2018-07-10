@@ -7,6 +7,8 @@ android {
             keyPassword '333333'
             storeFile file('./darkal.jks')
             storePassword '333333'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     dexOptions {

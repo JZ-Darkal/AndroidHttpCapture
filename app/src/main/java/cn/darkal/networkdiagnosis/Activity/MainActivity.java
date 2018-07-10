@@ -659,8 +659,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
 
     public void createZip(final Runnable callback) {
-        showLoading("打包中");
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -668,6 +666,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                     @Override
                     public void run() {
                         try {
+                            showLoading("打包中");
+
                             final Har har = getFiltedHar();
                             final File saveHarFile = new File(Environment.getExternalStorageDirectory() + "/har/test.har");
                             har.writeTo(saveHarFile);
