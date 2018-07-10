@@ -57,7 +57,7 @@ schema的协议格式为：jdhttpmonitor://webview?param={'url'='http://www.dark
 
 ### 已知BUG<br>
 1. 信任所有的服务器证书不做校验<br>
-2. 开启返回包注入功能后，https返回的部分页面存在 err_CONTENT_LENGTH_MISMATCH 错误<br>
+~~2. 开启返回包注入功能后，https返回的部分页面存在 err_CONTENT_LENGTH_MISMATCH 错误<br>~~（看起来似乎是解决了，待用户反馈）
 
 #### 如果觉得工具好用的话请多多star以及Pull requests<br>支持我喝杯咖啡请扫描下面的二维码，谢谢(ง •̀_•́)ง<br>
 ![image](http://h5.darkal.cn/har/guide/img/code.jpg)<br><br>
