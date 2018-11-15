@@ -57,7 +57,7 @@ public class HarCookie {
         this.domain = domain;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.ssZ")
     public Date getExpires() {
         return expires;
     }

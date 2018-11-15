@@ -8,7 +8,7 @@ android {
             storeFile file('./darkal.jks')
             storePassword '333333'
             v1SigningEnabled true
-            v2SigningEnabled true
+            v2SigningEnabled false
         }
     }
     dexOptions {
@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId "cn.darkal.networkdiagnosis"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 31
         versionName "3.2.31"
         // Enabling multidex support.
