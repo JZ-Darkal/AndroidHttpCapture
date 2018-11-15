@@ -2,7 +2,7 @@
 是一款针对于移动流量劫持而开发的手机抓包软件，可以当作是Android版的‘Fiddler’<br>
 主要功能包括：手机端抓包、PING/DNS/TraceRoute诊断、抓包HAR数据上传分享<br>
 使用前请确保手机HTTP代理的关闭<br><br>
-### [Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>![image](http://h5.darkal.cn/har/1478783982.jpg?t=1) <br><br>
+### [Demo APK下载](http://h5.darkal.cn/har/demo.apk)<br>
 
 ### [点击查看操作手册](http://h5.darkal.cn/har/guide/widget.guide.html)<br><br>
 
