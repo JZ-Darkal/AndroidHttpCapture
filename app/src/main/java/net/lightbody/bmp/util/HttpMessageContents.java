@@ -1,17 +1,19 @@
 package net.lightbody.bmp.util;
 
-import io.netty.handler.codec.http.FullHttpMessage;
-import io.netty.handler.codec.http.HttpHeaders;
 import net.lightbody.bmp.exception.UnsupportedCharsetException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 
+import io.netty.handler.codec.http.FullHttpMessage;
+import io.netty.handler.codec.http.HttpHeaders;
+
 /**
  * Helper class to wrap the contents of an {@link io.netty.handler.codec.http.HttpMessage}. Contains convenience methods to extract and
  * manipulate the contents of the wrapped {@link io.netty.handler.codec.http.HttpMessage}.
- *
+ * <p>
  * TODO: Currently this class only wraps FullHttpMessages, since it must modify the Content-Length header; determine if this may be applied to chunked messages as well
  */
 public class HttpMessageContents {
@@ -25,36 +27,6 @@ public class HttpMessageContents {
 
     public HttpMessageContents(FullHttpMessage httpMessage) {
         this.httpMessage = httpMessage;
-    }
-
-    /**
-     * Replaces the contents of the wrapped HttpMessage with the specified text contents, encoding them in the character set specified by the
-     * message's Content-Type header. Note that this method does not update the Content-Type header, so if the content type will change as a
-     * result of this call, the Content-Type header should be updated before calling this method.
-     *
-     * @param newContents new message contents
-     */
-    public void setTextContents(String newContents) {
-        HttpObjectUtil.replaceTextHttpEntityBody(httpMessage, newContents);
-
-        // replaced the contents, so clear the local cache
-        textContents = null;
-        binaryContents = null;
-    }
-
-    /**
-     * Replaces the contents of the wrapped HttpMessage with the specified binary contents. Note that this method does not update the
-     * Content-Type header, so if the content type will change as a result of this call, the Content-Type header should be updated before
-     * calling this method.
-     *
-     * @param newBinaryContents new message contents
-     */
-    public void setBinaryContents(byte[] newBinaryContents) {
-        HttpObjectUtil.replaceBinaryHttpEntityBody(httpMessage, newBinaryContents);
-
-        // replaced the contents, so clear the local cache
-        binaryContents = null;
-        textContents = null;
     }
 
     /**
@@ -75,6 +47,21 @@ public class HttpMessageContents {
     }
 
     /**
+     * Replaces the contents of the wrapped HttpMessage with the specified text contents, encoding them in the character set specified by the
+     * message's Content-Type header. Note that this method does not update the Content-Type header, so if the content type will change as a
+     * result of this call, the Content-Type header should be updated before calling this method.
+     *
+     * @param newContents new message contents
+     */
+    public void setTextContents(String newContents) {
+        HttpObjectUtil.replaceTextHttpEntityBody(httpMessage, newContents);
+
+        // replaced the contents, so clear the local cache
+        textContents = null;
+        binaryContents = null;
+    }
+
+    /**
      * Retrieves the binary contents of this message. This method caches the contents, so repeated calls to this method should not incur a
      * penalty; however, modifications to the message contents outside of this class will result in stale data returned from this method.
      *
@@ -87,6 +74,21 @@ public class HttpMessageContents {
         }
 
         return binaryContents;
+    }
+
+    /**
+     * Replaces the contents of the wrapped HttpMessage with the specified binary contents. Note that this method does not update the
+     * Content-Type header, so if the content type will change as a result of this call, the Content-Type header should be updated before
+     * calling this method.
+     *
+     * @param newBinaryContents new message contents
+     */
+    public void setBinaryContents(byte[] newBinaryContents) {
+        HttpObjectUtil.replaceBinaryHttpEntityBody(httpMessage, newBinaryContents);
+
+        // replaced the contents, so clear the local cache
+        binaryContents = null;
+        textContents = null;
     }
 
     /**

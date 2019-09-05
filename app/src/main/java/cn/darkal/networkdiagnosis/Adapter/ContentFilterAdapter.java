@@ -12,28 +12,22 @@ import android.widget.BaseAdapter;
 import java.util.List;
 
 import cn.darkal.networkdiagnosis.Activity.ChangeFilterActivity;
-import cn.darkal.networkdiagnosis.Activity.MainActivity;
 import cn.darkal.networkdiagnosis.BR;
-import cn.darkal.networkdiagnosis.Bean.PageBean;
 import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
-import cn.darkal.networkdiagnosis.Fragment.PreviewFragment;
 import cn.darkal.networkdiagnosis.R;
-import cn.darkal.networkdiagnosis.SysApplication;
-import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 
 /**
  * Created by Darkal on 2016/9/5.
  */
 
-public class ContentFilterAdapter extends BaseAdapter{
+public class ContentFilterAdapter extends BaseAdapter {
     ChangeFilterActivity changeFilterActivity;
+    private List<ResponseFilterRule> ruleList;
 
-    public ContentFilterAdapter(ChangeFilterActivity changeFilterActivity,List<ResponseFilterRule> ruleList){
+    public ContentFilterAdapter(ChangeFilterActivity changeFilterActivity, List<ResponseFilterRule> ruleList) {
         this.ruleList = ruleList;
         this.changeFilterActivity = changeFilterActivity;
     }
-
-    private List<ResponseFilterRule> ruleList;
 
     @Override
     public int getCount() {
@@ -60,7 +54,7 @@ public class ContentFilterAdapter extends BaseAdapter{
             convertView = listItemBinding.getRoot();
             convertView.setTag(listItemBinding);
         }
-        listItemBinding.setVariable(BR.pages,ruleList.get(position));
+        listItemBinding.setVariable(BR.pages, ruleList.get(position));
         listItemBinding.executePendingBindings();
 //        listItemBinding.cli(new ButtonClick(MainActivity.this,position));
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -75,12 +69,14 @@ public class ContentFilterAdapter extends BaseAdapter{
                 AlertDialog.Builder builder = new AlertDialog.Builder(changeFilterActivity);
                 builder.setTitle("请确认是否清除该注入项?");
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         ruleList.remove(ruleList.get(position));
                         ContentFilterAdapter.this.notifyDataSetChanged();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                     }
                 });

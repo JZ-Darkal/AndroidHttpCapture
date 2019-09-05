@@ -87,7 +87,7 @@ public class HarCaptureUtil {
     /**
      * Returns the error message for the HAR response when no response was received from the server (e.g. when the
      * browser is closed).
-     * 
+     *
      * @return the no response received error message
      */
     public static String getNoResponseReceivedErrorMessage() {

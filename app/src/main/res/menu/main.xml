@@ -4,24 +4,25 @@
 
     <item
         android:id="@+id/action_home"
+        android:icon="@drawable/ic_home_white_24dp"
         android:orderInCategory="1"
         android:title="网址导航"
-        android:icon="@drawable/ic_home_white_24dp"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
-    <item android:id="@+id/search"
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search_white_24dp"
         android:title="搜索"
         android:visible="false"
-        android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/action_filter"
-        android:orderInCategory="90"
-        android:visible="false"
         android:icon="@drawable/ic_filter_list_white_24dp"
+        android:orderInCategory="90"
         android:title="分页选择"
+        android:visible="false"
         app:showAsAction="always" />
 
     <item

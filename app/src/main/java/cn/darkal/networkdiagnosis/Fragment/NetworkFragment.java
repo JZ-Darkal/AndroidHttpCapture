@@ -18,28 +18,22 @@ import cn.darkal.networkdiagnosis.Task.TraceTask;
 
 public class NetworkFragment extends BaseFragment {
 
+    static NetworkFragment networkFragment;
     @BindView(R.id.bt_ping)
     Button pingButton;
-
     @BindView(R.id.bt_dns)
     Button dnsButton;
-
     @BindView(R.id.bt_trace)
     Button traceButton;
-
     @BindView(R.id.bt_info)
     Button infoButton;
-
     @BindView(R.id.tv_result)
     TextView resultTextView;
-
     @BindView(R.id.et_url)
     EditText urlEditText;
 
-    static NetworkFragment networkFragment;
-
     public static NetworkFragment getInstance() {
-        if(networkFragment == null){
+        if (networkFragment == null) {
             networkFragment = new NetworkFragment();
         }
         return networkFragment;
@@ -64,7 +58,7 @@ public class NetworkFragment extends BaseFragment {
         pingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PingTask pingTask = new PingTask(urlEditText.getText()+"",resultTextView);
+                PingTask pingTask = new PingTask(urlEditText.getText() + "", resultTextView);
                 pingTask.doTask();
             }
         });
@@ -72,7 +66,7 @@ public class NetworkFragment extends BaseFragment {
         dnsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DnsTask pingTask = new DnsTask(urlEditText.getText()+"",resultTextView);
+                DnsTask pingTask = new DnsTask(urlEditText.getText() + "", resultTextView);
                 pingTask.doTask();
             }
         });
@@ -80,7 +74,7 @@ public class NetworkFragment extends BaseFragment {
         traceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TraceTask pingTask = new TraceTask(getActivity(),urlEditText.getText()+"",resultTextView);
+                TraceTask pingTask = new TraceTask(getActivity(), urlEditText.getText() + "", resultTextView);
                 pingTask.doTask();
             }
         });
@@ -88,7 +82,7 @@ public class NetworkFragment extends BaseFragment {
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InfoTask pingTask = new InfoTask(urlEditText.getText()+"",resultTextView);
+                InfoTask pingTask = new InfoTask(urlEditText.getText() + "", resultTextView);
                 pingTask.doTask();
             }
         });

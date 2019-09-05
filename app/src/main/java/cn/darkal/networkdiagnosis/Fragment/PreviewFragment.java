@@ -28,17 +28,13 @@ import cn.darkal.networkdiagnosis.View.RecycleViewDivider;
 
 public class PreviewFragment extends BaseFragment {
 
+    static PreviewFragment previewFragment;
     @BindView(R.id.rv_preview)
     RecyclerView recyclerView;
-
     HarLog harLog;
     List<HarEntry> harEntryList = new ArrayList<>();
-
     PreviewAdapter previewAdapter;
-
     Boolean isHiddenHID = false;
-
-    static PreviewFragment previewFragment;
 
     public static PreviewFragment getInstance() {
         if (previewFragment == null) {
@@ -59,7 +55,7 @@ public class PreviewFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_preview, container, false);
         ButterKnife.bind(this, view);
 
-        if(SysApplication.isInitProxy) {
+        if (SysApplication.isInitProxy) {
             harLog = ((SysApplication) getActivity().getApplication()).proxy.getHar().getLog();
             harEntryList.addAll(harLog.getEntries());
         }
@@ -67,13 +63,54 @@ public class PreviewFragment extends BaseFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(previewAdapter = new PreviewAdapter());
 
-        if(((MainActivity) getActivity()).searchView!=null){
+        if (((MainActivity) getActivity()).searchView != null) {
             ((MainActivity) getActivity()).searchView.setVisibility(View.VISIBLE);
         }
 
         return view;
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+//            ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.nav_preview);
+            notifyHarChange();
+        }
+    }
+
+    public void notifyHarChange() {
+        if (previewAdapter != null) {
+            harLog = ((MainActivity) getActivity()).getFiltedHar().getLog();
+            harEntryList.clear();
+            harEntryList.addAll(harLog.getEntries());
+            previewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
+
+    public void filterItem(CharSequence s) {
+        if (previewAdapter != null) {
+            previewAdapter.getFilter().filter(s);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // 这里为了解决返回后焦点在搜索栏的bug
+        if (recyclerView != null) {
+            recyclerView.requestFocus();
+            if (((MainActivity) getActivity()).searchView != null) {
+                filterItem(((MainActivity) getActivity()).searchView.getQuery());
+            }
+        }
+    }
 
     private class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.MyViewHolder> implements Filterable {
 
@@ -87,13 +124,13 @@ public class PreviewFragment extends BaseFragment {
             HarEntry harEntry = harEntryList.get(position);
             holder.rootView.setOnClickListener(new ClickListner(harEntry));
             holder.tv.setText(harEntry.getRequest().getUrl());
-            if(harEntry.getResponse().getStatus()>400){
+            if (harEntry.getResponse().getStatus() > 400) {
                 holder.iconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_error_black_24dp));
-            }else if(harEntry.getResponse().getStatus()>300){
+            } else if (harEntry.getResponse().getStatus() > 300) {
                 holder.iconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_directions_black_24dp));
-            }else if(harEntry.getResponse().getContent().getMimeType().contains("image")) {
+            } else if (harEntry.getResponse().getContent().getMimeType().contains("image")) {
                 holder.iconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_photo_black_24dp));
-            }else{
+            } else {
                 holder.iconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_description_black_24dp));
             }
             holder.detailTextView.setText("Status:" + harEntry.getResponse().getStatus() +
@@ -104,23 +141,6 @@ public class PreviewFragment extends BaseFragment {
         @Override
         public int getItemCount() {
             return harEntryList.size();
-        }
-
-
-        public class MyViewHolder extends RecyclerView.ViewHolder {
-
-            TextView tv;
-            TextView detailTextView;
-            View rootView;
-            ImageView iconView;
-
-            public MyViewHolder(View view) {
-                super(view);
-                tv = (TextView) view.findViewById(R.id.tv_url);
-                detailTextView = (TextView) view.findViewById(R.id.tv_detail);
-                rootView = view;
-                iconView = (ImageView) view.findViewById(R.id.iv_icon);
-            }
         }
 
         @Override
@@ -172,7 +192,7 @@ public class PreviewFragment extends BaseFragment {
                 @Override
                 protected void publishResults(CharSequence constraint, FilterResults results) {
                     harEntryList.clear();//清除原始数据
-                    if(results.values instanceof List){
+                    if (results.values instanceof List) {
                         harEntryList.addAll((List<HarEntry>) results.values);//将过滤结果添加到这个对象
                     }
                     if (results.count > 0) {
@@ -190,65 +210,39 @@ public class PreviewFragment extends BaseFragment {
                 }
             };
         }
-    }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-//            ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.nav_preview);
-            notifyHarChange();
-        }
-    }
+        public class MyViewHolder extends RecyclerView.ViewHolder {
 
-    public void notifyHarChange(){
-        if (previewAdapter != null) {
-            harLog = ((MainActivity) getActivity()).getFiltedHar().getLog();
-            harEntryList.clear();
-            harEntryList.addAll(harLog.getEntries());
-            previewAdapter.notifyDataSetChanged();
+            TextView tv;
+            TextView detailTextView;
+            View rootView;
+            ImageView iconView;
+
+            public MyViewHolder(View view) {
+                super(view);
+                tv = (TextView) view.findViewById(R.id.tv_url);
+                detailTextView = (TextView) view.findViewById(R.id.tv_detail);
+                rootView = view;
+                iconView = (ImageView) view.findViewById(R.id.iv_icon);
+            }
         }
     }
 
     public class ClickListner implements View.OnClickListener {
         HarEntry harEntry;
 
-        public ClickListner(HarEntry harEntry){
+        public ClickListner(HarEntry harEntry) {
             this.harEntry = harEntry;
         }
 
         @Override
         public void onClick(View view) {
-            if(harLog.getEntries().indexOf(harEntry)>=0) {
+            if (harLog.getEntries().indexOf(harEntry) >= 0) {
                 isHiddenHID = true;
                 Intent intent = new Intent(getContext(), HarDetailActivity.class);
                 intent.putExtra("pos", ((SysApplication) getActivity().getApplication()).proxy.
                         getHar().getLog().getEntries().indexOf(harEntry));
                 getActivity().startActivity(intent);
-            }
-        }
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return false;
-    }
-
-    public void filterItem(CharSequence s){
-        if(previewAdapter!=null) {
-            previewAdapter.getFilter().filter(s);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // 这里为了解决返回后焦点在搜索栏的bug
-        if(recyclerView!=null) {
-            recyclerView.requestFocus();
-            if(((MainActivity)getActivity()).searchView!=null) {
-                filterItem(((MainActivity) getActivity()).searchView.getQuery());
             }
         }
     }

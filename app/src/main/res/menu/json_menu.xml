@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/encode"
-        android:orderInCategory="90"
         android:icon="@drawable/ic_style_white_24dp"
+        android:orderInCategory="90"
         android:title="编码切换"
         app:showAsAction="always" />
 </menu>

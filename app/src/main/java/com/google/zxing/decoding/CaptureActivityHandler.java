@@ -53,14 +53,8 @@ public final class CaptureActivityHandler extends Handler {
 
     private final QrCodeScanActivity activity;
     private final DecodeThread decodeThread;
-    private State state;
     private final CameraManager cameraManager;
-
-    private enum State {
-        PREVIEW,
-        SUCCESS,
-        DONE
-    }
+    private State state;
 
     public CaptureActivityHandler(QrCodeScanActivity activity,
                                   Collection<BarcodeFormat> decodeFormats,
@@ -158,6 +152,12 @@ public final class CaptureActivityHandler extends Handler {
             cameraManager.requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
             activity.drawViewfinder();
         }
+    }
+
+    private enum State {
+        PREVIEW,
+        SUCCESS,
+        DONE
     }
 
 }

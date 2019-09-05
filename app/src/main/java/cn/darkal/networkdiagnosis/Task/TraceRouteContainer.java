@@ -40,49 +40,40 @@ public class TraceRouteContainer implements Serializable {
         this.isSuccessful = isSuccessful;
     }
 
-    public String getHostname()
-    {
+    public String getHostname() {
         return hostname;
     }
 
-    public void setHostname(String hostname)
-    {
+    public void setHostname(String hostname) {
         this.hostname = hostname;
     }
 
-    public String getIp()
-    {
+    public String getIp() {
         return ip;
     }
 
-    public void setIp(String ip)
-    {
+    public void setIp(String ip) {
         this.ip = ip;
     }
 
-    public float getMs()
-    {
+    public float getMs() {
         return ms;
     }
 
-    public void setMs(float ms)
-    {
+    public void setMs(float ms) {
         this.ms = ms;
     }
 
-    public boolean isSuccessful()
-    {
+    public boolean isSuccessful() {
         return isSuccessful;
     }
 
-    public void setSuccessful(boolean isSuccessful)
-    {
+    public void setSuccessful(boolean isSuccessful) {
         this.isSuccessful = isSuccessful;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Traceroute : \nHostname : " + hostname + "\nip : " + ip + "\nMilliseconds : " + ms;
     }
 

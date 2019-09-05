@@ -1,13 +1,9 @@
 package net.lightbody.bmp.filters;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import net.lightbody.bmp.util.HttpUtil;
 import net.lightbody.bmp.proxy.RewriteRule;
 import net.lightbody.bmp.util.BrowserMobHttpUtil;
+import net.lightbody.bmp.util.HttpUtil;
+
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +12,12 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Matcher;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * Applies rewrite rules to the specified request. If a rewrite rule matches, the request's URI will be overwritten with the rewritten URI.

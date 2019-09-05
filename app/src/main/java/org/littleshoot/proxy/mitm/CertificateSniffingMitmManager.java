@@ -1,15 +1,15 @@
 package org.littleshoot.proxy.mitm;
 
+import org.littleshoot.proxy.MitmManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
-
-import org.littleshoot.proxy.MitmManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.netty.handler.codec.http.HttpRequest;
 
@@ -39,14 +39,17 @@ public class CertificateSniffingMitmManager implements MitmManager {
         }
     }
 
+    @Override
     public SSLEngine serverSslEngine(String peerHost, int peerPort) {
         return sslEngineSource.newSslEngine(peerHost, peerPort);
     }
 
+    @Override
     public SSLEngine serverSslEngine() {
         return sslEngineSource.newSslEngine();
     }
 
+    @Override
     public SSLEngine clientSslEngineFor(HttpRequest httpRequest, SSLSession serverSslSession) {
         try {
             X509Certificate upstreamCert = getCertificateFromSession(serverSslSession);

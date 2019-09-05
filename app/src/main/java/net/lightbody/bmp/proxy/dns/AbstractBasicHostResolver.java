@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * Use this class to supply a {@link HostResolver} to {@link net.lightbody.bmp.BrowserMobProxy#setHostNameResolver(AdvancedHostResolver)}
  * if you do not need {@link AdvancedHostResolver} functionality.
  */
-public abstract class BasicHostResolver implements AdvancedHostResolver {
+public abstract class AbstractBasicHostResolver implements AdvancedHostResolver {
     @Override
     public void remapHosts(Map<String, String> hostRemappings) {
         throw new UnsupportedOperationException(new Throwable().getStackTrace()[0].getMethodName() + " is not supported by this host resolver (" + this.getClass().getName() + ")");

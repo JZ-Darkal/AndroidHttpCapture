@@ -1,6 +1,5 @@
 package cn.darkal.networkdiagnosis.Utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -166,7 +165,7 @@ public class SharedPreferenceUtils {
     /**
      * 获取SharedPreference保存的对象
      *
-     * @param context    context
+     * @param context context
      * @param key     储存对象的key
      * @return object 返回根据key得到的对象
      */

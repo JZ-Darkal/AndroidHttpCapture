@@ -43,10 +43,11 @@ import cn.darkal.networkdiagnosis.View.LoadingDialog;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity implements Preference.OnPreferenceChangeListener {
+public class SettingsActivity extends AbstractAppCompatPreferenceActivity implements Preference.OnPreferenceChangeListener {
 
     ListPreference lp;//创建一个ListPreference对象
     Preference hostPreference;
+    private LoadingDialog loadingDialog;
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -127,7 +128,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
         return isXLargeTablet(this);
     }
 
-
     //让所选择的项显示出来,获取变化并显示出来
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -143,13 +143,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
         }
 
         // 设置hosts
-        if (preference.getKey().equals("system_host")) {
-            DeviceUtils.changeHost(((SysApplication)getApplication()).proxy,newValue.toString());
+        if ("system_host".equals(preference.getKey())) {
+            DeviceUtils.changeHost(((SysApplication) getApplication()).proxy, newValue.toString());
             hostPreference.setSummary(getHost());
         }
 
         // 重启抓包进程
-        if (preference.getKey().equals("enable_filter")) {
+        if ("enable_filter".equals(preference.getKey())) {
             Toast.makeText(this, "重启程序后生效", Toast.LENGTH_SHORT).show();
 //            ((SysApplication)getApplication()).stopProxy();
 //            ((SysApplication)getApplication()).startProxy();
@@ -157,8 +157,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
         }
         return true;
     }
-
-
 
     public void installCert() {
         final String CERTIFICATE_RESOURCE = Environment.getExternalStorageDirectory() + "/har/littleproxy-mitm.pem";
@@ -188,10 +186,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Pre
             }
         };
 
-        FileUtil.checkPermission(this,runnable);
+        FileUtil.checkPermission(this, runnable);
     }
-
-    private LoadingDialog loadingDialog;
 
     public void showLoading(final String text) {
         runOnUiThread(new Runnable() {

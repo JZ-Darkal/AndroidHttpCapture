@@ -1,13 +1,13 @@
 package net.lightbody.bmp.mitm.tools;
 
 import com.google.common.io.CharStreams;
+
 import net.lightbody.bmp.mitm.CertificateAndKey;
 import net.lightbody.bmp.mitm.CertificateInfo;
 import net.lightbody.bmp.mitm.exception.ImportException;
 import net.lightbody.bmp.mitm.exception.KeyStoreAccessException;
 import net.lightbody.bmp.mitm.util.KeyStoreUtil;
 
-import javax.net.ssl.KeyManager;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +25,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.KeyManager;
 
 /**
  * A {@link SecurityProviderTool} implementation that uses the default system Security provider where possible, but uses the

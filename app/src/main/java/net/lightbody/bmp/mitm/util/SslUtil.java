@@ -3,20 +3,14 @@ package net.lightbody.bmp.mitm.util;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.CharStreams;
-import io.netty.handler.ssl.OpenSsl;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SupportedCipherSuiteFilter;
-import net.lightbody.bmp.mitm.trustmanager.InsecureTrustManagerFactory;
+
 import net.lightbody.bmp.mitm.TrustSource;
 import net.lightbody.bmp.mitm.exception.SslContextInitializationException;
+import net.lightbody.bmp.mitm.trustmanager.InsecureTrustManagerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +22,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 
 /**
  * Utility for creating SSLContexts.
@@ -74,8 +78,8 @@ public class SslUtil {
      * supply an appropriate trustSource except in extraordinary circumstances (e.g. testing with dynamically-generated
      * certificates).
      *
-     * @param cipherSuites    cipher suites to allow when connecting to the upstream server
-     * @param trustSource     the trust store that will be used to validate upstream servers' certificates, or null to accept all upstream server certificates
+     * @param cipherSuites cipher suites to allow when connecting to the upstream server
+     * @param trustSource  the trust store that will be used to validate upstream servers' certificates, or null to accept all upstream server certificates
      * @return an SSLContext to connect to upstream servers with
      */
     public static SslContext getUpstreamServerSslContext(Collection<String> cipherSuites, TrustSource trustSource) {

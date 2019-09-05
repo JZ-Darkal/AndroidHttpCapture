@@ -36,7 +36,7 @@ public class MyVpnService extends VpnService {
 
     private void setupVpn() {
         ParcelFileDescriptor parcelFileDescriptor;
-        Log.i("~~~","VpnService: try to setup VPN.");
+        Log.i("~~~", "VpnService: try to setup VPN.");
         Builder builder = new Builder();
         builder.setSession("firewall");
         builder.addAddress("10.0.8.1", 32);
@@ -134,10 +134,11 @@ public class MyVpnService extends VpnService {
                 }
 
             }
-        }catch(final IllegalStateException e) {
-            Log.i("~~~","VpnService: builder.establish() failed.");
-            if(mHandler != null) {
+        } catch (final IllegalStateException e) {
+            Log.i("~~~", "VpnService: builder.establish() failed.");
+            if (mHandler != null) {
                 mHandler.post(new Runnable() {
+                    @Override
                     public void run() {
                         Toast.makeText(MyVpnService.this, "Cannot establish VPN (" + e.toString() + ")",
                                 Toast.LENGTH_LONG).show();
@@ -363,6 +364,8 @@ public class MyVpnService extends VpnService {
                         break;
                     case 's':
                         builder.addSearchDomain(fields[1]);
+                        break;
+                    default:
                         break;
                 }
             } catch (Exception e) {

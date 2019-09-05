@@ -2,7 +2,6 @@ package cn.darkal.networkdiagnosis.Task;
 
 import android.widget.TextView;
 
-
 import cn.darkal.networkdiagnosis.Utils.NetInfo.NetBasicInfo;
 import cn.darkal.networkdiagnosis.Utils.NetInfo.SystemBasicInfo;
 
@@ -13,18 +12,6 @@ public class InfoTask extends BaseTask {
     String url;
 
     TextView resultTextView;
-
-    public InfoTask(String url, TextView resultTextView) {
-        super(url, resultTextView);
-        this.url = url;
-        this.resultTextView = resultTextView;
-    }
-
-    @Override
-    public Runnable getExecRunnable() {
-        return execRunnable;
-    }
-
     public Runnable execRunnable = new Runnable() {
         @Override
         public void run() {
@@ -38,4 +25,15 @@ public class InfoTask extends BaseTask {
                     + "\n"));
         }
     };
+
+    public InfoTask(String url, TextView resultTextView) {
+        super(url, resultTextView);
+        this.url = url;
+        this.resultTextView = resultTextView;
+    }
+
+    @Override
+    public Runnable getExecRunnable() {
+        return execRunnable;
+    }
 }

@@ -37,7 +37,7 @@ public class SystemBasicInfo {
     public static String getUUID(Context context) {
         try {
             String androidId = getAndroidId(context);
-            String deviceId = getDeviceId(context)==null? "null":getDeviceId(context);
+            String deviceId = getDeviceId(context) == null ? "null" : getDeviceId(context);
             UUID uuid = new UUID(androidId.hashCode(), ((long) deviceId.hashCode() << 32) | deviceId.hashCode());
             return uuid.toString();
         } catch (Exception e) {

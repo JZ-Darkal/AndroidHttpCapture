@@ -51,12 +51,6 @@ public final class ViewfinderView extends View {
     private static final int CURRENT_POINT_OPACITY = 0xA0;
     private static final int MAX_RESULT_POINTS = 20;
     private static final int POINT_SIZE = 6;
-
-    /**
-     * 四个绿色边角对应的长度
-     */
-    private int ScreenRate;
-
     /**
      * 四个绿色边角对应的宽度
      */
@@ -65,21 +59,14 @@ public final class ViewfinderView extends View {
      * 扫描框中的中间线的宽度
      */
     private static final float MIDDLE_LINE_WIDTH = 3;
-
     /**
      * 扫描框中的中间线的与扫描框左右的间隙
      */
     private static final float MIDDLE_LINE_PADDING = 5;
-
     /**
      * 中间那条线每次刷新移动的距离
      */
     private static final float SPEEN_DISTANCE = 4;
-
-    /**
-     * 手机的屏幕密度
-     */
-    private static float density;
     /**
      * 字体大小
      */
@@ -88,30 +75,32 @@ public final class ViewfinderView extends View {
      * 字体距离扫描框下面的距离
      */
     private static final int TEXT_PADDING_TOP = 24;
-
+    /**
+     * 手机的屏幕密度
+     */
+    private static float density;
+    private final int maskColor;
+    private final int resultColor;
+    private final int resultPointColor;
+    boolean isFirst;
+    /**
+     * 四个绿色边角对应的长度
+     */
+    private int ScreenRate;
     /**
      * 画笔对象的引用
      */
     private Paint paint;
-
     /**
      * 中间滑动线的最顶端位置
      */
     private float slideTop;
-
     /**
      * 中间滑动线的最底端位置
      */
     private int slideBottom;
-
-
-    boolean isFirst;
-
     private CameraManager cameraManager;
     private Bitmap resultBitmap;
-    private final int maskColor;
-    private final int resultColor;
-    private final int resultPointColor;
     private int scannerAlpha;
     private List<ResultPoint> possibleResultPoints;
     private List<ResultPoint> lastPossibleResultPoints;
@@ -153,7 +142,7 @@ public final class ViewfinderView extends View {
         }
 
         //初始化中间线滑动的最上边和最下边
-        if(!isFirst){
+        if (!isFirst) {
             isFirst = true;
             slideTop = frame.top;
             slideBottom = frame.bottom;
@@ -183,11 +172,11 @@ public final class ViewfinderView extends View {
             canvas.drawRect(frame.left - 1, frame.top - 1, frame.left - 1 + ScreenRate, frame.top - 1 + CORNER_WIDTH, paint);
             canvas.drawRect(frame.left - 1, frame.top - 1, frame.left - 1 + CORNER_WIDTH, frame.top - 1 + ScreenRate, paint);
             canvas.drawRect(frame.right + 2 - ScreenRate, frame.top - 1, frame.right + 2, frame.top - 1 + CORNER_WIDTH, paint);
-            canvas.drawRect(frame.right+2 - CORNER_WIDTH, frame.top-1, frame.right+2, frame.top-1 + ScreenRate, paint);
-            canvas.drawRect(frame.left-1, frame.bottom+2 - CORNER_WIDTH, frame.left-1 + ScreenRate, frame.bottom+2, paint);
-            canvas.drawRect(frame.left-1, frame.bottom+2 - ScreenRate, frame.left-1 + CORNER_WIDTH, frame.bottom+2, paint);
-            canvas.drawRect(frame.right+2 - ScreenRate, frame.bottom+2 - CORNER_WIDTH, frame.right+2, frame.bottom+2, paint);
-            canvas.drawRect(frame.right+2 - CORNER_WIDTH, frame.bottom+2 - ScreenRate, frame.right+2, frame.bottom+2, paint);
+            canvas.drawRect(frame.right + 2 - CORNER_WIDTH, frame.top - 1, frame.right + 2, frame.top - 1 + ScreenRate, paint);
+            canvas.drawRect(frame.left - 1, frame.bottom + 2 - CORNER_WIDTH, frame.left - 1 + ScreenRate, frame.bottom + 2, paint);
+            canvas.drawRect(frame.left - 1, frame.bottom + 2 - ScreenRate, frame.left - 1 + CORNER_WIDTH, frame.bottom + 2, paint);
+            canvas.drawRect(frame.right + 2 - ScreenRate, frame.bottom + 2 - CORNER_WIDTH, frame.right + 2, frame.bottom + 2, paint);
+            canvas.drawRect(frame.right + 2 - CORNER_WIDTH, frame.bottom + 2 - ScreenRate, frame.right + 2, frame.bottom + 2, paint);
 
             paint.setColor(Color.WHITE);
             canvas.drawLine(frame.left, frame.bottom, frame.left, frame.top, paint);
@@ -197,15 +186,15 @@ public final class ViewfinderView extends View {
 
             //绘制中间的线,每次刷新界面，中间的线往下移动SPEEN_DISTANCE
             slideTop += SPEEN_DISTANCE;
-            if(slideTop >= frame.bottom) {
+            if (slideTop >= frame.bottom) {
                 slideTop = frame.top;
             }
             Shader shaderNew = new LinearGradient(frame.left + MIDDLE_LINE_PADDING, 0, frame.right - MIDDLE_LINE_PADDING, 0,
-                    new int[] { 0x00FFFFFF, 0xFF00FF00, 0xFF00FF00, 0x00FFFFFF }, null, Shader.TileMode.MIRROR);
+                    new int[]{0x00FFFFFF, 0xFF00FF00, 0xFF00FF00, 0x00FFFFFF}, null, Shader.TileMode.MIRROR);
             Shader shaderOld = paint.getShader();
             paint.setShader(shaderNew);
-            canvas.drawRect(frame.left + MIDDLE_LINE_PADDING, slideTop - MIDDLE_LINE_WIDTH/2,
-                    frame.right - MIDDLE_LINE_PADDING, slideTop + MIDDLE_LINE_WIDTH/2, paint);
+            canvas.drawRect(frame.left + MIDDLE_LINE_PADDING, slideTop - MIDDLE_LINE_WIDTH / 2,
+                    frame.right - MIDDLE_LINE_PADDING, slideTop + MIDDLE_LINE_WIDTH / 2, paint);
 
             paint.setShader(shaderOld);
 
@@ -215,7 +204,7 @@ public final class ViewfinderView extends View {
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setTypeface(Typeface.create("system", Typeface.NORMAL));
             //paint.setTypeface(Typeface.SANS_SERIF);
-            canvas.drawText(getResources().getString(R.string.scan_text), frame.centerX(), (float) (frame.bottom + (float)TEXT_PADDING_TOP * density), paint);
+            canvas.drawText(getResources().getString(R.string.scan_text), frame.centerX(), (float) (frame.bottom + (float) TEXT_PADDING_TOP * density), paint);
 
             float scaleX = frame.width() / (float) previewFrame.width();
             float scaleY = frame.height() / (float) previewFrame.height();

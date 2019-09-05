@@ -6,23 +6,15 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.filters.RequestFilter;
 import net.lightbody.bmp.filters.ResponseFilter;
 import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
 import net.lightbody.bmp.util.HttpMessageContents;
 import net.lightbody.bmp.util.HttpMessageInfo;
 
-import org.littleshoot.proxy.HttpFilters;
-import org.littleshoot.proxy.HttpFiltersSource;
-
-import java.net.InetSocketAddress;
 import java.util.List;
 
 import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.SysApplication;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 
 /**
@@ -67,11 +59,11 @@ public class DeviceUtils {
         //dp和px的转换关系
         float density = context.getResources().getDisplayMetrics().density;
         //2*1.5+0.5  2*0.75 = 1.5+0.5
-        return (int)(dp*density+0.5);
+        return (int) (dp * density + 0.5);
     }
 
 
-    public static void changeHost(BrowserMobProxy browserMobProxy,String newValue){
+    public static void changeHost(BrowserMobProxy browserMobProxy, String newValue) {
         AdvancedHostResolver advancedHostResolver = browserMobProxy.getHostNameResolver();
         advancedHostResolver.clearHostRemappings();
         for (String temp : newValue.split("\\n")) {
@@ -85,17 +77,17 @@ public class DeviceUtils {
         browserMobProxy.setHostNameResolver(advancedHostResolver);
     }
 
-    public static void changeResponseFilter(SysApplication sysApplication,final List<ResponseFilterRule> ruleList){
-        if(ruleList == null){
-            Log.e("~~~~","changeResponseFilter ruleList == null!");
+    public static void changeResponseFilter(SysApplication sysApplication, final List<ResponseFilterRule> ruleList) {
+        if (ruleList == null) {
+            Log.e("~~~~", "changeResponseFilter ruleList == null!");
             return;
         }
 
         sysApplication.proxy.addResponseFilter(new ResponseFilter() {
             @Override
             public void filterResponse(HttpResponse response, HttpMessageContents contents, HttpMessageInfo messageInfo) {
-                for (ResponseFilterRule rule: ruleList) {
-                    if(rule.getEnable()) {
+                for (ResponseFilterRule rule : ruleList) {
+                    if (rule.getEnable()) {
                         if (contents.isText() && messageInfo.getUrl().contains(rule.getUrl())) {
                             String originContent = contents.getTextContents();
                             if (originContent != null) {

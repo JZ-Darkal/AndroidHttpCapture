@@ -49,7 +49,7 @@ public class HarTimings {
     public void setDns(long dns, TimeUnit timeUnit) {
         if (dns == -1) {
             this.dnsNanos = -1;
-        } else{
+        } else {
             this.dnsNanos = TimeUnit.NANOSECONDS.convert(dns, timeUnit);
         }
     }

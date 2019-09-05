@@ -33,7 +33,7 @@ import javax.net.ssl.X509TrustManager;
  * @see SSLParameters#setEndpointIdentificationAlgorithm(String)
  * @since 1.7
  */
-public abstract class X509ExtendedTrustManager implements X509TrustManager {
+public abstract class AbstractX509ExtendedTrustManager implements X509TrustManager {
     /**
      * Checks whether the specified certificate chain (partial or complete) can
      * be validated and is trusted for client authentication for the specified

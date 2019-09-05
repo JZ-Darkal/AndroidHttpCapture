@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * A LittleProxy HostResolver that delegates to the specified {@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver} instance. This class
  * serves as a bridge between {@link AdvancedHostResolver} and {@link org.littleshoot.proxy.HostResolver}.
-*/
+ */
 public class DelegatingHostResolver implements org.littleshoot.proxy.HostResolver {
     private volatile AdvancedHostResolver resolver;
 

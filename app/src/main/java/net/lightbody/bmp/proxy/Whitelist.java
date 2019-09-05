@@ -15,14 +15,13 @@ import java.util.regex.Pattern;
  * whitelist reference to a new whitelist.
  */
 public class Whitelist {
-    private final List<Pattern> patterns;
-    private final int statusCode;
-    private final boolean enabled;
-
     /**
      * A disabled Whitelist.
      */
     public static final Whitelist WHITELIST_DISABLED = new Whitelist();
+    private final List<Pattern> patterns;
+    private final int statusCode;
+    private final boolean enabled;
 
     /**
      * Creates an empty, disabled Whitelist.
@@ -56,7 +55,7 @@ public class Whitelist {
      * Creates a whitelist for the specified patterns, returning the given statusCode when a URL does not match one of the patterns.
      * A null or empty collection will result in an empty whitelist.
      *
-     * @param patterns URL-matching regular expression patterns to whitelist
+     * @param patterns   URL-matching regular expression patterns to whitelist
      * @param statusCode the HTTP status code to return when a request URL matches a whitelist pattern
      */
     public Whitelist(Collection<String> patterns, int statusCode) {

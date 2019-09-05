@@ -1,14 +1,16 @@
 package net.lightbody.bmp.util;
 
-import io.netty.handler.codec.http.FullHttpMessage;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMessage;
 import net.lightbody.bmp.exception.UnsupportedCharsetException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+
+import io.netty.handler.codec.http.FullHttpMessage;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMessage;
 
 /**
  * Utility class to assist with manipulation of {@link io.netty.handler.codec.http.HttpObject} instances, including
@@ -21,10 +23,10 @@ public class HttpObjectUtil {
      * Replaces the entity body of the message with the specified contents. Encodes the message contents according to charset in the message's
      * Content-Type header, or uses {@link BrowserMobHttpUtil#DEFAULT_HTTP_CHARSET} if none is specified.
      * <b>Note:</b> If the charset of the message is not supported on this platform, this will throw an {@link java.nio.charset.UnsupportedCharsetException}.
-     *
+     * <p>
      * TODO: Currently this method only works for FullHttpMessages, since it must modify the Content-Length header; determine if this may be applied to chunked messages as well
      *
-     * @param message the HTTP message to manipulate
+     * @param message     the HTTP message to manipulate
      * @param newContents the new entity body contents
      * @throws java.nio.charset.UnsupportedCharsetException if the charset in the message is not supported on this platform
      */
@@ -36,7 +38,7 @@ public class HttpObjectUtil {
         try {
             messageCharset = BrowserMobHttpUtil.readCharsetInContentTypeHeader(contentTypeHeader);
         } catch (UnsupportedCharsetException e) {
-            java.nio.charset.UnsupportedCharsetException cause = e.getUnsupportedCharsetExceptionCause() ;
+            java.nio.charset.UnsupportedCharsetException cause = e.getUnsupportedCharsetExceptionCause();
             log.error("Found unsupported character set in Content-Type header '{}' while attempting to replace contents of HTTP message.", contentTypeHeader, cause);
 
             throw cause;
@@ -56,7 +58,7 @@ public class HttpObjectUtil {
      * Replaces an HTTP entity body with the specified binary contents.
      * TODO: Currently this method only works for FullHttpMessages, since it must modify the Content-Length header; determine if this may be applied to chunked messages as well
      *
-     * @param message the HTTP message to manipulate
+     * @param message           the HTTP message to manipulate
      * @param newBinaryContents the new entity body contents
      */
     public static void replaceBinaryHttpEntityBody(FullHttpMessage message, byte[] newBinaryContents) {
@@ -74,7 +76,7 @@ public class HttpObjectUtil {
      * the character set is not specified or is unknown, you still must specify a suitable default charset (see {@link BrowserMobHttpUtil#DEFAULT_HTTP_CHARSET}).
      *
      * @param httpContent HTTP content object to extract the entity body from
-     * @param charset character set of the entity body
+     * @param charset     character set of the entity body
      * @return String representation of the entity body
      * @throws IllegalArgumentException if the charset is null
      */

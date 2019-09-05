@@ -13,18 +13,6 @@ import java.io.InputStreamReader;
 public class PingTask extends BaseTask {
     String url;
     TextView resultTextView;
-
-    public PingTask(String url, TextView resultTextView) {
-        super(url, resultTextView);
-        this.url = url;
-        this.resultTextView = resultTextView;
-    }
-
-    @Override
-    public Runnable getExecRunnable() {
-        return execRunnable;
-    }
-
     public Runnable execRunnable = new Runnable() {
         @Override
         public void run() {
@@ -48,14 +36,25 @@ public class PingTask extends BaseTask {
             } catch (IOException e) {
                 resultTextView.post(new updateResultRunnable(e.toString() + "\n"));
             } finally {
-                try{
+                try {
                     if (in != null) {
                         in.close();
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
     };
+
+    public PingTask(String url, TextView resultTextView) {
+        super(url, resultTextView);
+        this.url = url;
+        this.resultTextView = resultTextView;
+    }
+
+    @Override
+    public Runnable getExecRunnable() {
+        return execRunnable;
+    }
 }

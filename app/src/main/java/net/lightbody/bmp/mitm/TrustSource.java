@@ -2,6 +2,7 @@ package net.lightbody.bmp.mitm;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.common.io.Files;
+
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
 import net.lightbody.bmp.mitm.util.TrustUtil;
 
@@ -15,19 +16,19 @@ import java.util.List;
 /**
  * A source of trusted root certificate authorities. Provides static methods to obtain default trust sources:
  * <ul>
- *     <li>{@link #defaultTrustSource()}- both the built-in and JVM-trusted CAs</li>
- *     <li>{@link #javaTrustSource()} - only default CAs trusted by the JVM</li>
- *     <li>{@link #builtinTrustSource()} - only built-in trusted CAs (ultimately derived from Firefox's trust list)</li>
+ * <li>{@link #defaultTrustSource()}- both the built-in and JVM-trusted CAs</li>
+ * <li>{@link #javaTrustSource()} - only default CAs trusted by the JVM</li>
+ * <li>{@link #builtinTrustSource()} - only built-in trusted CAs (ultimately derived from Firefox's trust list)</li>
  * </ul>
- *
+ * <p>
  * Custom TrustSources can be built by starting with {@link #empty()}, then calling the various add() methods to add
  * PEM-encoded files and Strings, KeyStores, and X509Certificates to the TrustSource. For example:
  * <p/>
  * <code>
- *      TrustSource customTrustSource = TrustSource.empty()
- *              .add(myX509Certificate)
- *              .add(pemFileContainingMyCA)
- *              .add(javaKeyStore);
+ * TrustSource customTrustSource = TrustSource.empty()
+ * .add(myX509Certificate)
+ * .add(pemFileContainingMyCA)
+ * .add(javaKeyStore);
  * </code>
  * <p/>
  * <b>Note:</b> This class is immutable, so calls to add() will return a new instance, rather than modifying the existing instance.
@@ -65,14 +66,6 @@ public class TrustSource {
     }
 
     /**
-     * Returns the X509 certificates considered "trusted" by this TrustSource. This method will not return null, but
-     * may return an empty array.
-     */
-    public X509Certificate[] getTrustedCAs() {
-        return trustedCAs;
-    }
-
-    /**
      * Returns a TrustSource that contains no trusted CAs. Can be used in conjunction with the add() methods to build
      * a TrustSource containing custom CAs from a variety of sources (PEM files, KeyStores, etc.).
      */
@@ -101,6 +94,14 @@ public class TrustSource {
      */
     public static TrustSource javaTrustSource() {
         return new TrustSource(TrustUtil.getJavaTrustedCAs());
+    }
+
+    /**
+     * Returns the X509 certificates considered "trusted" by this TrustSource. This method will not return null, but
+     * may return an empty array.
+     */
+    public X509Certificate[] getTrustedCAs() {
+        return trustedCAs;
     }
 
     /**

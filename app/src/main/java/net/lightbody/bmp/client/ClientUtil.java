@@ -1,7 +1,7 @@
 package net.lightbody.bmp.client;
 
 import com.google.common.collect.ImmutableList;
-import net.lightbody.bmp.BrowserMobProxy;
+
 import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
 import net.lightbody.bmp.proxy.dns.ChainedHostResolver;
 import net.lightbody.bmp.proxy.dns.DnsJavaResolver;
@@ -9,7 +9,6 @@ import net.lightbody.bmp.proxy.dns.NativeCacheManipulatingResolver;
 import net.lightbody.bmp.proxy.dns.NativeResolver;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 /**

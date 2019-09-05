@@ -58,9 +58,24 @@ android {
     }
     productFlavors {
     }
-    lintOptions {
-        abortOnError false
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
     }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        warningsAsErrors false
+        disable "UnusedResources"
+        textOutput "stdout"
+        textReport true
+    }
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
 }
 
 dependencies {

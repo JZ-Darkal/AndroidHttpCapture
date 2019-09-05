@@ -3,7 +3,6 @@ package net.lightbody.bmp.mitm.tools;
 import net.lightbody.bmp.mitm.CertificateAndKey;
 import net.lightbody.bmp.mitm.CertificateInfo;
 
-import javax.net.ssl.KeyManager;
 import java.io.File;
 import java.io.Reader;
 import java.security.KeyPair;
@@ -11,6 +10,8 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.KeyManager;
 
 /**
  * Generic interface for functionality provided by a Security Provider.

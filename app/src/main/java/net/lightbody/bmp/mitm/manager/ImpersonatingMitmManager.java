@@ -7,11 +7,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SupportedCipherSuiteFilter;
+
 import net.lightbody.bmp.mitm.CertificateAndKey;
 import net.lightbody.bmp.mitm.CertificateAndKeySource;
 import net.lightbody.bmp.mitm.CertificateInfo;
@@ -31,14 +27,11 @@ import net.lightbody.bmp.mitm.util.EncryptionUtil;
 import net.lightbody.bmp.mitm.util.MitmConstants;
 import net.lightbody.bmp.mitm.util.SslUtil;
 import net.lightbody.bmp.util.HttpUtil;
+
 import org.littleshoot.proxy.MitmManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLSession;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -48,6 +41,17 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSession;
+
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 
 /**
  * An {@link MitmManager} that will create SSLEngines for clients that present impersonated certificates for upstream servers. The impersonated
@@ -66,7 +70,30 @@ public class ImpersonatingMitmManager implements MitmManager {
      * Cipher suites allowed on client connections to the proxy.
      */
     private final List<String> clientCipherSuites;
-
+    /**
+     * Cache for impersonating netty SslContexts. SslContexts can be safely reused, so caching the impersonating contexts avoids
+     * repeatedly re-impersonating upstream servers.
+     */
+    private final Cache<String, SslContext> sslContextCache;
+    /**
+     * Generator used to create public and private keys for the server certificates.
+     */
+    private final KeyGenerator serverKeyGenerator;
+    /**
+     * The source of the CA's {@link CertificateAndKey} that will be used to sign generated server certificates.
+     */
+    private final CertificateAndKeySource rootCertificateSource;
+    /**
+     * The message digest used to sign the server certificate, such as SHA512.
+     * See https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest for information
+     * on supported message digests.
+     */
+    private final String serverCertificateMessageDigest;
+    /**
+     * The source of trusted root CAs. May be null, which disables all upstream certificate validation. Disabling upstream
+     * certificate validation allows attackers to intercept communciations and should only be used during testing.
+     */
+    private final TrustSource trustSource;
     /**
      * The SSLContext that will be used for communications with all upstream servers. This can be reused, so store it as a lazily-loaded singleton.
      */
@@ -76,36 +103,6 @@ public class ImpersonatingMitmManager implements MitmManager {
             return SslUtil.getUpstreamServerSslContext(serverCipherSuites, trustSource);
         }
     });
-
-    /**
-     * Cache for impersonating netty SslContexts. SslContexts can be safely reused, so caching the impersonating contexts avoids
-     * repeatedly re-impersonating upstream servers.
-     */
-    private final Cache<String, SslContext> sslContextCache;
-
-    /**
-     * Generator used to create public and private keys for the server certificates.
-     */
-    private final KeyGenerator serverKeyGenerator;
-
-    /**
-     * The source of the CA's {@link CertificateAndKey} that will be used to sign generated server certificates.
-     */
-    private final CertificateAndKeySource rootCertificateSource;
-
-    /**
-     * The message digest used to sign the server certificate, such as SHA512.
-     * See https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest for information
-     * on supported message digests.
-     */
-    private final String serverCertificateMessageDigest;
-
-    /**
-     * The source of trusted root CAs. May be null, which disables all upstream certificate validation. Disabling upstream
-     * certificate validation allows attackers to intercept communciations and should only be used during testing.
-     */
-    private final TrustSource trustSource;
-
     /**
      * Utility used to generate {@link CertificateInfo} objects when impersonating an upstream server.
      */
@@ -115,7 +112,10 @@ public class ImpersonatingMitmManager implements MitmManager {
      * Tool implementation that is used to generate, sign, and otherwise manipulate server certificates.
      */
     private final SecurityProviderTool securityProviderTool;
-
+    /**
+     * Simple server certificate generation statistics.
+     */
+    private final CertificateGenerationStatistics statistics = new CertificateGenerationStatistics();
     /**
      * The CA root root certificate used to sign generated server certificates. {@link CertificateAndKeySource#load()}
      * is only called once to retrieve the CA root certificate, which will be used to impersonate all server certificates.
@@ -126,11 +126,6 @@ public class ImpersonatingMitmManager implements MitmManager {
             return rootCertificateSource.load();
         }
     });
-
-    /**
-     * Simple server certificate generation statistics.
-     */
-    private final CertificateGenerationStatistics statistics = new CertificateGenerationStatistics();
 
     /**
      * Creates a new ImpersonatingMitmManager. In general, use {@link ImpersonatingMitmManager.Builder}
@@ -190,6 +185,26 @@ public class ImpersonatingMitmManager implements MitmManager {
         log.debug("Allowed ciphers for client connections to proxy (some ciphers may not be available): {}", clientCipherSuites);
     }
 
+    /**
+     * Convenience method to return a new {@link Builder} instance default default values: a {@link RootCertificateGenerator}
+     * that dynamically generates an RSA root certificate and RSA server certificates.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Convenience method to return a new {@link Builder} instance that will dynamically create EC root certificates and
+     * EC server certificates, but otherwise uses default values.
+     */
+    public static Builder builderWithECC() {
+        return new Builder()
+                .serverKeyGenerator(new ECKeyGenerator())
+                .rootCertificateSource(RootCertificateGenerator.builder()
+                        .keyGenerator(new ECKeyGenerator())
+                        .build());
+    }
+
     @Override
     public SSLEngine serverSslEngine() {
         try {
@@ -238,7 +253,7 @@ public class ImpersonatingMitmManager implements MitmManager {
      * which impersonates the specified hostname.
      *
      * @param hostnameToImpersonate the hostname for which the impersonated SSLContext is being requested
-     * @param sslSession the upstream server SSLSession
+     * @param sslSession            the upstream server SSLSession
      * @return SSLContext which will present an impersonated certificate
      */
     private SslContext getHostnameImpersonatingSslContext(final String hostnameToImpersonate, final SSLSession sslSession) {
@@ -261,7 +276,7 @@ public class ImpersonatingMitmManager implements MitmManager {
      * This is a convenience method for {@link #createImpersonatingSslContext(CertificateInfo)} that generates the
      * {@link CertificateInfo} from the specified hostname using the {@link #certificateInfoGenerator}.
      *
-     * @param sslSession sslSession between the proxy and the upstream server
+     * @param sslSession            sslSession between the proxy and the upstream server
      * @param hostnameToImpersonate hostname (supplied by the client's HTTP CONNECT) that will be impersonated
      * @return an SSLContext presenting a certificate matching the hostnameToImpersonate
      */
@@ -341,26 +356,6 @@ public class ImpersonatingMitmManager implements MitmManager {
      */
     public CertificateGenerationStatistics getStatistics() {
         return this.statistics;
-    }
-
-    /**
-     * Convenience method to return a new {@link Builder} instance default default values: a {@link RootCertificateGenerator}
-     * that dynamically generates an RSA root certificate and RSA server certificates.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Convenience method to return a new {@link Builder} instance that will dynamically create EC root certificates and
-     * EC server certificates, but otherwise uses default values.
-     */
-    public static Builder builderWithECC() {
-        return new Builder()
-                .serverKeyGenerator(new ECKeyGenerator())
-                .rootCertificateSource(RootCertificateGenerator.builder()
-                        .keyGenerator(new ECKeyGenerator())
-                        .build());
     }
 
     /**

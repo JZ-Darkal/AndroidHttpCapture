@@ -28,19 +28,19 @@ public class PageBean {
     }
 
     public String getCount() {
-        return count+"请求";
-    }
-
-    public Integer getCountInt() {
-        try{
-            return Integer.parseInt(count);
-        }catch (Exception e){
-            return 0;
-        }
+        return count + "请求";
     }
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    public Integer getCountInt() {
+        try {
+            return Integer.parseInt(count);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public Boolean getSelected() {

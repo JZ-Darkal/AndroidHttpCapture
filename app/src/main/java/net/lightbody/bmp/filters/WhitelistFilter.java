@@ -1,5 +1,11 @@
 package net.lightbody.bmp.filters;
 
+import org.littleshoot.proxy.impl.ProxyUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.regex.Pattern;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -7,11 +13,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.littleshoot.proxy.impl.ProxyUtils;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.regex.Pattern;
 
 /**
  * Checks this request against the whitelist, and returns the modified response if the request is not in the whitelist. The filter does not
@@ -23,7 +24,7 @@ public class WhitelistFilter extends HttpsAwareFiltersAdapter {
     private final int whitelistResponseCode;
     private final Collection<Pattern> whitelistUrls;
 
-    public WhitelistFilter(HttpRequest originalRequest, ChannelHandlerContext ctx, boolean whitelistEnabled,int whitelistResponseCode,
+    public WhitelistFilter(HttpRequest originalRequest, ChannelHandlerContext ctx, boolean whitelistEnabled, int whitelistResponseCode,
                            Collection<Pattern> whitelistUrls) {
         super(originalRequest, ctx);
 

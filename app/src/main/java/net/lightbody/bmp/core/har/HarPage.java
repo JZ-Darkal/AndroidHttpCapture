@@ -7,10 +7,10 @@ import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HarPage {
+    private final HarPageTimings pageTimings = new HarPageTimings();
     private volatile String id;
     private volatile Date startedDateTime;
     private volatile String title = "";
-    private final HarPageTimings pageTimings = new HarPageTimings();
     private volatile String comment = "";
 
     public HarPage() {

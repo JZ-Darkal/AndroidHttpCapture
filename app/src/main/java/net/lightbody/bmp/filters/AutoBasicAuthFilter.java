@@ -1,13 +1,14 @@
 package net.lightbody.bmp.filters;
 
+import org.littleshoot.proxy.impl.ProxyUtils;
+
+import java.util.Map;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
-import org.littleshoot.proxy.impl.ProxyUtils;
-
-import java.util.Map;
 
 /**
  * A filter that adds Basic authentication information to non-CONNECT requests. Takes a map of domain names to base64-encoded

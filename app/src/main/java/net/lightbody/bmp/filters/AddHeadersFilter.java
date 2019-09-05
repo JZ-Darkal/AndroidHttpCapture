@@ -1,12 +1,13 @@
 package net.lightbody.bmp.filters;
 
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 
 import java.util.Collections;
 import java.util.Map;
+
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * Adds the headers specified in the constructor to this request. The filter does not make a defensive copy of the map, so there is no guarantee

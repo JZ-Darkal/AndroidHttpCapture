@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -76,7 +75,7 @@ public class HarDetailActivity extends AppCompatActivity {
         addItem("Request Header");
         for (HarNameValuePair pair : harRequest.getHeaders()) {
             // 不显示cookie
-            if (!pair.getName().equals("Cookie")) {
+            if (!"Cookie".equals(pair.getName())) {
                 addItem(pair.getName(), pair.getDecodeValue());
             }
         }
@@ -89,14 +88,14 @@ public class HarDetailActivity extends AppCompatActivity {
         }
 
         if (harRequest.getPostData() != null) {
-            if(harRequest.getPostData().getText()!= null
-                    && harRequest.getPostData().getText().length()>0) {
+            if (harRequest.getPostData().getText() != null
+                    && harRequest.getPostData().getText().length() > 0) {
                 addItem("Request Content");
                 addItem("PostData", harRequest.getPostData().getText());
             }
 
-            if(harRequest.getPostData().getParams()!= null
-                    &&  harRequest.getPostData().getParams().size()>0){
+            if (harRequest.getPostData().getParams() != null
+                    && harRequest.getPostData().getParams().size() > 0) {
                 addItem("Request PostData");
 
                 for (HarPostDataParam pair : harRequest.getPostData().getParams()) {
@@ -107,7 +106,7 @@ public class HarDetailActivity extends AppCompatActivity {
 
         addItem("Response Header");
         for (HarNameValuePair pair : harResponse.getHeaders()) {
-            if (!pair.getName().equals("Cookie")) {
+            if (!"Cookie".equals(pair.getName())) {
                 addItem(pair.getName(), pair.getDecodeValue());
             }
         }
@@ -145,7 +144,7 @@ public class HarDetailActivity extends AppCompatActivity {
             valueTextView.setText(value.substring(0, value.length() > 50 ? 50 : value.length()));
         }
 
-        if (title.equals("Content")) {
+        if ("Content".equals(title)) {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

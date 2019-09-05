@@ -45,8 +45,8 @@ final class DecodeThread extends Thread {
 
     private final QrCodeScanActivity activity;
     private final Map<DecodeHintType, Object> hints;
-    private Handler handler;
     private final CountDownLatch handlerInitLatch;
+    private Handler handler;
 
     DecodeThread(QrCodeScanActivity activity,
                  Collection<BarcodeFormat> decodeFormats,

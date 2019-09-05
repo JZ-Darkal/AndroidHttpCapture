@@ -49,13 +49,14 @@ public class HarEntry {
      * Rather than storing the time directly, calculate the time from the HarTimings as required in the HAR spec.
      * From <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html">https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html</a>,
      * section <code>4.2.16 timings</code>:
-     <pre>
-     Following must be true in case there are no -1 values (entry is an object in log.entries) :
-
-     entry.time == entry.timings.blocked + entry.timings.dns +
-     entry.timings.connect + entry.timings.send + entry.timings.wait +
-     entry.timings.receive;
-     </pre>
+     * <pre>
+     * Following must be true in case there are no -1 values (entry is an object in log.entries) :
+     *
+     * entry.time == entry.timings.blocked + entry.timings.dns +
+     * entry.timings.connect + entry.timings.send + entry.timings.wait +
+     * entry.timings.receive;
+     * </pre>
+     *
      * @return time for this HAR entry, in milliseconds
      */
     public long getTime() {

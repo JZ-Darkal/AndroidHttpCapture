@@ -3,10 +3,7 @@ package net.lightbody.bmp;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
+
 import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarLog;
@@ -31,11 +28,7 @@ import net.lightbody.bmp.filters.ResponseFilterAdapter;
 import net.lightbody.bmp.filters.RewriteUrlFilter;
 import net.lightbody.bmp.filters.UnregisterRequestFilter;
 import net.lightbody.bmp.filters.WhitelistFilter;
-import net.lightbody.bmp.mitm.KeyStoreFileCertificateSource;
 import net.lightbody.bmp.mitm.TrustSource;
-import net.lightbody.bmp.mitm.keys.ECKeyGenerator;
-import net.lightbody.bmp.mitm.keys.RSAKeyGenerator;
-import net.lightbody.bmp.mitm.manager.ImpersonatingMitmManager;
 import net.lightbody.bmp.proxy.ActivityMonitor;
 import net.lightbody.bmp.proxy.BlacklistEntry;
 import net.lightbody.bmp.proxy.CaptureType;
@@ -46,6 +39,7 @@ import net.lightbody.bmp.proxy.dns.AdvancedHostResolver;
 import net.lightbody.bmp.proxy.dns.DelegatingHostResolver;
 import net.lightbody.bmp.util.BrowserMobHttpUtil;
 import net.lightbody.bmp.util.BrowserMobProxyUtil;
+
 import org.littleshoot.proxy.ChainedProxy;
 import org.littleshoot.proxy.ChainedProxyAdapter;
 import org.littleshoot.proxy.ChainedProxyManager;
@@ -69,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -83,26 +76,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+
 /**
  * A LittleProxy-based implementation of {@link net.lightbody.bmp.BrowserMobProxy}.
  */
 public class BrowserMobProxyServer implements BrowserMobProxy {
+    /**
+     * The default pseudonym to use when adding the Via header to proxied requests.
+     */
+    public static final String VIA_HEADER_ALIAS = "browsermobproxy";
     private static final Logger log = LoggerFactory.getLogger(BrowserMobProxyServer.class);
-
     private static final HarNameVersion HAR_CREATOR_VERSION = new HarNameVersion("BrowserMob Proxy", BrowserMobProxyUtil.getVersionString());
-
     /* Default MITM resources */
     private static final String RSA_KEYSTORE_RESOURCE = "/sslSupport/ca-keystore-rsa.p12";
     private static final String EC_KEYSTORE_RESOURCE = "/sslSupport/ca-keystore-ec.p12";
     private static final String KEYSTORE_TYPE = "PKCS12";
     private static final String KEYSTORE_PRIVATE_KEY_ALIAS = "key";
     private static final String KEYSTORE_PASSWORD = "password";
-
-    /**
-     * The default pseudonym to use when adding the Via header to proxied requests.
-     */
-    public static final String VIA_HEADER_ALIAS = "browsermobproxy";
-
     /**
      * True only after the proxy has been successfully started.
      */
@@ -117,42 +111,64 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
      * Tracks the current page count, for use when auto-generating HAR page names.
      */
     private final AtomicInteger harPageCount = new AtomicInteger(0);
-
-    /**
-     * When true, MITM will be disabled. The proxy will no longer intercept HTTPS requests, but they will still be proxied.
-     */
-    private volatile boolean mitmDisabled = false;
-
-    /**
-     * The MITM manager that will be used for HTTPS requests.
-     */
-    private volatile MitmManager mitmManager;
-
     /**
      * The list of filterFactories that will generate the filters that implement browsermob-proxy behavior.
      */
     private final List<HttpFiltersSource> filterFactories = new CopyOnWriteArrayList<>();
-
+    /**
+     * List of accepted URL patterns. Unlisted URL patterns will be rejected with the response code contained in the Whitelist.
+     */
+    private final AtomicReference<Whitelist> whitelist = new AtomicReference<>(Whitelist.WHITELIST_DISABLED);
+    /**
+     * Set to true once the HAR capture filter has been added to the filter chain.
+     */
+    private final AtomicBoolean harCaptureFilterEnabled = new AtomicBoolean(false);
+    /**
+     * Set to true when LittleProxy has been bootstrapped with the default chained proxy. This allows modifying the chained proxy
+     * after the proxy has been started.
+     */
+    private final AtomicBoolean bootstrappedWithDefaultChainedProxy = new AtomicBoolean(false);
+    /**
+     * Resolver to use when resolving hostnames to IP addresses. This is a bridge between {@link org.littleshoot.proxy.HostResolver} and
+     * {@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver}. It allows the resolvers to be changed on-the-fly without re-bootstrapping the
+     * littleproxy server. The default resolver (native JDK resolver) can be changed using {@link #setHostNameResolver(net.lightbody.bmp.proxy.dns.AdvancedHostResolver)} and
+     * supplying one of the pre-defined resolvers in {@link ClientUtil}, such as {@link ClientUtil#createDnsJavaWithNativeFallbackResolver()}
+     * or {@link ClientUtil#createDnsJavaResolver()}. You can also build your own resolver, or use {@link net.lightbody.bmp.proxy.dns.ChainedHostResolver}
+     * to chain together multiple DNS resolvers.
+     */
+    private final DelegatingHostResolver delegatingResolver = new DelegatingHostResolver(ClientUtil.createNativeCacheManipulatingResolver());
+    private final ActivityMonitor activityMonitor = new ActivityMonitor();
+    /**
+     * A mapping of hostnames to base64-encoded Basic auth credentials that will be added to the Authorization header for
+     * matching requests.
+     */
+    private final ConcurrentMap<String, String> basicAuthCredentials = new MapMaker()
+            .concurrencyLevel(1)
+            .makeMap();
+    /**
+     * When true, MITM will be disabled. The proxy will no longer intercept HTTPS requests, but they will still be proxied.
+     */
+    private volatile boolean mitmDisabled = false;
+    /**
+     * The MITM manager that will be used for HTTPS requests.
+     */
+    private volatile MitmManager mitmManager;
     /**
      * List of rejected URL patterns
      */
     private volatile Collection<BlacklistEntry> blacklistEntries = new CopyOnWriteArrayList<>();
-
     /**
      * List of URLs to rewrite
      */
     private volatile CopyOnWriteArrayList<RewriteRule> rewriteRules = new CopyOnWriteArrayList<>();
-
     /**
      * The LittleProxy instance that performs all proxy operations.
      */
     private volatile HttpProxyServer proxyServer;
-
     /**
      * No capture types are enabled by default.
      */
     private volatile EnumSet<CaptureType> harCaptureTypes = EnumSet.noneOf(CaptureType.class);
-
     /**
      * The current HAR being captured.
      */
@@ -170,93 +186,47 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
      */
     private volatile long writeBandwidthLimitBps;
     /**
-     * List of accepted URL patterns. Unlisted URL patterns will be rejected with the response code contained in the Whitelist.
-     */
-    private final AtomicReference<Whitelist> whitelist = new AtomicReference<>(Whitelist.WHITELIST_DISABLED);
-
-    /**
      * Additional headers that will be sent with every request. The map is declared as a ConcurrentMap to indicate that writes may be performed
      * by other threads concurrently (e.g. due to an incoming REST call), but the concurrencyLevel is set to 1 because modifications to the
      * additionalHeaders are rare, and in most cases happen only once, at start-up.
      */
     private volatile ConcurrentMap<String, String> additionalHeaders = new MapMaker().concurrencyLevel(1).makeMap();
-
     /**
      * The amount of time to wait while connecting to a server.
      */
     private volatile int connectTimeoutMs;
-
     /**
      * The amount of time a connection to a server can remain idle while receiving data from the server.
      */
     private volatile int idleConnectionTimeoutSec;
-
     /**
      * The amount of time to wait before forwarding the response to the client.
      */
     private volatile int latencyMs;
-
-    /**
-     * Set to true once the HAR capture filter has been added to the filter chain.
-     */
-    private final AtomicBoolean harCaptureFilterEnabled = new AtomicBoolean(false);
-
-    /**
-     * Set to true when LittleProxy has been bootstrapped with the default chained proxy. This allows modifying the chained proxy
-     * after the proxy has been started.
-     */
-    private final AtomicBoolean bootstrappedWithDefaultChainedProxy = new AtomicBoolean(false);
-
     /**
      * The address of an upstream chained proxy to route traffic through.
      */
     private volatile InetSocketAddress upstreamProxyAddress;
-
     /**
      * The chained proxy manager that manages upstream proxies.
      */
     private volatile ChainedProxyManager chainedProxyManager;
-
     /**
      * The address of the network interface from which the proxy will initiate connections.
      */
     private volatile InetAddress serverBindAddress;
-
     /**
      * The TrustSource that will be used to validate servers' certificates. If null, will not validate server certificates.
      */
     private volatile TrustSource trustSource = TrustSource.defaultTrustSource();
-
     /**
      * When true, use Elliptic Curve keys and certificates when impersonating upstream servers.
      */
     private volatile boolean useEcc = false;
-
-    /**
-     * Resolver to use when resolving hostnames to IP addresses. This is a bridge between {@link org.littleshoot.proxy.HostResolver} and
-     * {@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver}. It allows the resolvers to be changed on-the-fly without re-bootstrapping the
-     * littleproxy server. The default resolver (native JDK resolver) can be changed using {@link #setHostNameResolver(net.lightbody.bmp.proxy.dns.AdvancedHostResolver)} and
-     * supplying one of the pre-defined resolvers in {@link ClientUtil}, such as {@link ClientUtil#createDnsJavaWithNativeFallbackResolver()}
-     * or {@link ClientUtil#createDnsJavaResolver()}. You can also build your own resolver, or use {@link net.lightbody.bmp.proxy.dns.ChainedHostResolver}
-     * to chain together multiple DNS resolvers.
-     */
-    private final DelegatingHostResolver delegatingResolver = new DelegatingHostResolver(ClientUtil.createNativeCacheManipulatingResolver());
-
-    private final ActivityMonitor activityMonitor = new ActivityMonitor();
-
     /**
      * The acceptor and worker thread configuration for the Netty thread pools.
      */
     private volatile ThreadPoolConfiguration threadPoolConfiguration;
-
-    /**
-     * A mapping of hostnames to base64-encoded Basic auth credentials that will be added to the Authorization header for
-     * matching requests.
-     */
-    private final ConcurrentMap<String, String> basicAuthCredentials = new MapMaker()
-            .concurrencyLevel(1)
-            .makeMap();
-
     /**
      * Base64-encoded credentials to use to authenticate with the upstream proxy.
      */
@@ -331,7 +301,7 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
             try {
                 bootstrap.withManInTheMiddle(new CertificateSniffingMitmManager(
                         new Authority()));
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -363,7 +333,7 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
                                 String chainedProxyAuth = chainedProxyCredentials;
                                 if (chainedProxyAuth != null) {
                                     if (httpObject instanceof HttpRequest) {
-                                        HttpHeaders.addHeader((HttpRequest)httpObject, HttpHeaders.Names.PROXY_AUTHORIZATION, "Basic " + chainedProxyAuth);
+                                        HttpHeaders.addHeader((HttpRequest) httpObject, HttpHeaders.Names.PROXY_AUTHORIZATION, "Basic " + chainedProxyAuth);
                                     }
                                 }
                             }
@@ -487,11 +457,16 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
 
         harPageCount.set(0);
 
-        this.har = new Har(new HarLog(HAR_CREATOR_VERSION,this));
+        this.har = new Har(new HarLog(HAR_CREATOR_VERSION, this));
 
         newPage(initialPageRef, initialPageTitle);
 
         return oldHar;
+    }
+
+    @Override
+    public EnumSet<CaptureType> getHarCaptureTypes() {
+        return EnumSet.copyOf(harCaptureTypes);
     }
 
     @Override
@@ -510,11 +485,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
         } else {
             setHarCaptureTypes(EnumSet.copyOf(Arrays.asList(captureTypes)));
         }
-    }
-
-    @Override
-    public EnumSet<CaptureType> getHarCaptureTypes() {
-        return EnumSet.copyOf(harCaptureTypes);
     }
 
     @Override
@@ -603,6 +573,11 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
+    public long getReadBandwidthLimit() {
+        return readBandwidthLimitBps;
+    }
+
+    @Override
     public void setReadBandwidthLimit(long bytesPerSecond) {
         this.readBandwidthLimitBps = bytesPerSecond;
 
@@ -612,8 +587,8 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
-    public long getReadBandwidthLimit() {
-        return readBandwidthLimitBps;
+    public long getWriteBandwidthLimit() {
+        return writeBandwidthLimitBps;
     }
 
     @Override
@@ -623,11 +598,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
         if (isStarted()) {
             proxyServer.setThrottle(this.readBandwidthLimitBps, this.writeBandwidthLimitBps);
         }
-    }
-
-    @Override
-    public long getWriteBandwidthLimit() {
-        return writeBandwidthLimitBps;
     }
 
     public void endPage() {
@@ -642,7 +612,7 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
             return;
         }
 
-        previousPage.getPageTimings().setOnLoad(new Date().getTime() - previousPage.getStartedDateTime().getTime());
+        previousPage.getPageTimings().setOnLoad(System.currentTimeMillis() - previousPage.getStartedDateTime().getTime());
     }
 
     @Override
@@ -758,13 +728,13 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
-    public void setBlacklist(Collection<BlacklistEntry> blacklist) {
-        this.blacklistEntries = new CopyOnWriteArrayList<>(blacklist);
+    public Collection<BlacklistEntry> getBlacklist() {
+        return Collections.unmodifiableCollection(blacklistEntries);
     }
 
     @Override
-    public Collection<BlacklistEntry> getBlacklist() {
-        return Collections.unmodifiableCollection(blacklistEntries);
+    public void setBlacklist(Collection<BlacklistEntry> blacklist) {
+        this.blacklistEntries = new CopyOnWriteArrayList<>(blacklist);
     }
 
     @Override
@@ -872,18 +842,23 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
-    public void setHostNameResolver(AdvancedHostResolver resolver) {
-        delegatingResolver.setResolver(resolver);
-    }
-
-    @Override
     public AdvancedHostResolver getHostNameResolver() {
         return delegatingResolver.getResolver();
     }
 
     @Override
+    public void setHostNameResolver(AdvancedHostResolver resolver) {
+        delegatingResolver.setResolver(resolver);
+    }
+
+    @Override
     public boolean waitForQuiescence(long quietPeriod, long timeout, TimeUnit timeUnit) {
         return activityMonitor.waitForQuiescence(quietPeriod, timeout, timeUnit);
+    }
+
+    @Override
+    public InetSocketAddress getChainedProxy() {
+        return upstreamProxyAddress;
     }
 
     /**
@@ -901,11 +876,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
         }
 
         upstreamProxyAddress = chainedProxyAddress;
-    }
-
-    @Override
-    public InetSocketAddress getChainedProxy() {
-        return upstreamProxyAddress;
     }
 
     /**
@@ -1005,15 +975,6 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
     }
 
     @Override
-    public void setMitmDisabled(boolean mitmDisabled) throws IllegalStateException {
-        if (isStarted()) {
-            throw new IllegalStateException("Cannot disable MITM after the proxy has been started");
-        }
-
-        this.mitmDisabled = mitmDisabled;
-    }
-
-    @Override
     public void setMitmManager(MitmManager mitmManager) {
         this.mitmManager = mitmManager;
     }
@@ -1044,6 +1005,15 @@ public class BrowserMobProxyServer implements BrowserMobProxy {
 
     public boolean isMitmDisabled() {
         return this.mitmDisabled;
+    }
+
+    @Override
+    public void setMitmDisabled(boolean mitmDisabled) throws IllegalStateException {
+        if (isStarted()) {
+            throw new IllegalStateException("Cannot disable MITM after the proxy has been started");
+        }
+
+        this.mitmDisabled = mitmDisabled;
     }
 
     public void setUseEcc(boolean useEcc) {

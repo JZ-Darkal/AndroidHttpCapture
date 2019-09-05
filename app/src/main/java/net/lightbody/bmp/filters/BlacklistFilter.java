@@ -1,5 +1,10 @@
 package net.lightbody.bmp.filters;
 
+import net.lightbody.bmp.proxy.BlacklistEntry;
+
+import java.util.Collection;
+import java.util.Collections;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -8,10 +13,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.lightbody.bmp.proxy.BlacklistEntry;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Applies blacklist entries to this request. The filter does not make a defensive copy of the blacklist entries, so there is no guarantee

@@ -9,21 +9,21 @@ import android.widget.BaseAdapter;
 
 import java.util.List;
 
-import cn.darkal.networkdiagnosis.Bean.PageBean;
 import cn.darkal.networkdiagnosis.BR;
+import cn.darkal.networkdiagnosis.Bean.PageBean;
 import cn.darkal.networkdiagnosis.R;
 
 /**
  * Created by Darkal on 2016/9/5.
  */
 
-public class PageFilterAdapter extends BaseAdapter{
-
-    public PageFilterAdapter(List<PageBean> pageBeenList){
-        this.pageBeenList = pageBeenList;
-    }
+public class PageFilterAdapter extends BaseAdapter {
 
     private List<PageBean> pageBeenList;
+
+    public PageFilterAdapter(List<PageBean> pageBeenList) {
+        this.pageBeenList = pageBeenList;
+    }
 
     @Override
     public int getCount() {
@@ -50,7 +50,7 @@ public class PageFilterAdapter extends BaseAdapter{
             convertView = listItemBinding.getRoot();
             convertView.setTag(listItemBinding);
         }
-        listItemBinding.setVariable(BR.pages,pageBeenList.get(position));
+        listItemBinding.setVariable(BR.pages, pageBeenList.get(position));
         listItemBinding.executePendingBindings();
 //        listItemBinding.setButtonclick(new ButtonClick(MainActivity.this,position));
         return convertView;

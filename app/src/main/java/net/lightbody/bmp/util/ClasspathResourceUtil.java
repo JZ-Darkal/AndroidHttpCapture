@@ -1,6 +1,7 @@
 package net.lightbody.bmp.util;
 
 import com.google.common.io.CharStreams;
+
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
 
 import java.io.FileNotFoundException;
@@ -21,7 +22,7 @@ public class ClasspathResourceUtil {
      * method throws a FileNotFoundException wrapped in an UncheckedIOException.
      *
      * @param resource classpath resource to load
-     * @param charset charset to use to decode the classpath resource
+     * @param charset  charset to use to decode the classpath resource
      * @return a String
      * @throws UncheckedIOException if the classpath resource cannot be found or cannot be read for any reason
      */

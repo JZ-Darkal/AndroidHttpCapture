@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -428,7 +427,7 @@ public class FileUtil {
     }
 
     //递归删除文件夹下面的文件
-    public static void deleteFiles(File file){
+    public static void deleteFiles(File file) {
         try {
             if (file.exists()) {
                 if (file.isDirectory()) {
@@ -440,10 +439,11 @@ public class FileUtil {
                     file.delete();
                 }
             }
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
-    public static void checkPermission(Activity activity,Runnable runnable) {
+    public static void checkPermission(Activity activity, Runnable runnable) {
         //检查权限（NEED_PERMISSION）是否被授权 PackageManager.PERMISSION_GRANTED表示同意授权
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {

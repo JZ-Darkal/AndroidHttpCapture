@@ -1,5 +1,12 @@
 package net.lightbody.bmp.filters;
 
+import net.lightbody.bmp.util.BrowserMobHttpUtil;
+
+import org.littleshoot.proxy.HttpFiltersAdapter;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpContent;
@@ -8,11 +15,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
-import net.lightbody.bmp.util.BrowserMobHttpUtil;
-import org.littleshoot.proxy.HttpFiltersAdapter;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * This filter captures requests from the client (headers and content).
@@ -23,17 +25,15 @@ import java.io.IOException;
  */
 public class ClientRequestCaptureFilter extends HttpFiltersAdapter {
     /**
-     * Populated by clientToProxyRequest() when processing the HttpRequest object. Unlike originalRequest,
-     * this represents the "real" request that is being sent to the server, including headers.
-     */
-    private volatile HttpRequest httpRequest;
-
-    /**
      * Populated by clientToProxyRequest() when processing the HttpContent objects. If the request is chunked,
      * it will be populated across multiple calls to clientToProxyRequest().
      */
     private final ByteArrayOutputStream requestContents = new ByteArrayOutputStream();
-
+    /**
+     * Populated by clientToProxyRequest() when processing the HttpRequest object. Unlike originalRequest,
+     * this represents the "real" request that is being sent to the server, including headers.
+     */
+    private volatile HttpRequest httpRequest;
     /**
      * Populated by clientToProxyRequest() when processing the LastHttpContent.
      */
@@ -60,7 +60,7 @@ public class ClientRequestCaptureFilter extends HttpFiltersAdapter {
 
             if (httpContent instanceof LastHttpContent) {
                 LastHttpContent lastHttpContent = (LastHttpContent) httpContent;
-                trailingHeaders = lastHttpContent .trailingHeaders();
+                trailingHeaders = lastHttpContent.trailingHeaders();
             }
         }
 

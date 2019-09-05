@@ -17,33 +17,33 @@ public abstract class BaseTask {
         this.resultTextView = resultTextView;
     }
 
-    public void doTask(){
+    public void doTask() {
         resultTextView.setText("");
-        tag = System.currentTimeMillis()+"";
+        tag = System.currentTimeMillis() + "";
         resultTextView.setTag(tag);
         // TraceTask运行于主线程
-        if(this instanceof TraceTask){
+        if (this instanceof TraceTask) {
             getExecRunnable().run();
-        }else {
+        } else {
             new Thread(getExecRunnable()).start();
         }
     }
 
-    public class updateResultRunnable implements Runnable{
+    public abstract Runnable getExecRunnable();
+
+    public class updateResultRunnable implements Runnable {
         String resultString;
 
-        public updateResultRunnable(String resultString){
+        public updateResultRunnable(String resultString) {
             this.resultString = resultString;
         }
 
         @Override
         public void run() {
-            if(resultTextView!=null && resultTextView.getTag().equals(tag)) {
+            if (resultTextView != null && resultTextView.getTag().equals(tag)) {
                 resultTextView.append(resultString);
                 resultTextView.requestFocus();
             }
         }
     }
-
-    public abstract Runnable getExecRunnable();
 }

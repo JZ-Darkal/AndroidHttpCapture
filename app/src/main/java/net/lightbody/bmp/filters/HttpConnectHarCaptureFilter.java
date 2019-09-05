@@ -1,10 +1,7 @@
 package net.lightbody.bmp.filters;
 
 import com.google.common.cache.CacheBuilder;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
+
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarRequest;
@@ -13,6 +10,7 @@ import net.lightbody.bmp.core.har.HarTimings;
 import net.lightbody.bmp.filters.support.HttpConnectTiming;
 import net.lightbody.bmp.filters.util.HarCaptureUtil;
 import net.lightbody.bmp.util.HttpUtil;
+
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +21,11 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+
 /**
  * This filter captures HAR data for HTTP CONNECT requests. CONNECTs are "meta" requests that must be made before HTTPS
  * requests, but are not populated as separate requests in the HAR. Most information from HTTP CONNECTs (such as SSL
@@ -31,61 +34,9 @@ import java.util.concurrent.TimeUnit;
  * static methods. This filter also handles HTTP CONNECT errors and creates HAR entries for those errors, since there
  * would otherwise not be any record in the HAR of the error (if the CONNECT fails, there will be no subsequent "real"
  * request in which to record the error).
- *
  */
 public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implements ModifiedRequestAwareFilter {
     private static final Logger log = LoggerFactory.getLogger(HttpConnectHarCaptureFilter.class);
-
-    /**
-     * The currently active HAR at the time the current request is received.
-     */
-    private final Har har;
-
-    /**
-     * The currently active page ref at the time the current request is received.
-     */
-    private final String currentPageRef;
-
-    /**
-     * The time this CONNECT began. Used to populate the HAR entry in case of failure.
-     */
-    private volatile Date requestStartTime;
-
-    /**
-     * True if this filter instance processed a {@link #proxyToServerResolutionSucceeded(String, java.net.InetSocketAddress)} call, indicating
-     * that the hostname was resolved and populated in the HAR (if this is not a CONNECT).
-     */
-//    private volatile boolean addressResolved = false;
-    private volatile InetAddress resolvedAddress;
-
-    /**
-     * Populated by proxyToServerResolutionStarted when DNS resolution starts. If any previous filters already resolved the address, their resolution time
-     * will not be included in this time. See {@link HarCaptureFilter#dnsResolutionStartedNanos}.
-     */
-    private volatile long dnsResolutionStartedNanos;
-
-    private volatile long dnsResolutionFinishedNanos;
-
-    private volatile long connectionQueuedNanos;
-    private volatile long connectionStartedNanos;
-    private volatile long connectionSucceededTimeNanos;
-    private volatile long sendStartedNanos;
-    private volatile long sendFinishedNanos;
-
-    private volatile long responseReceiveStartedNanos;
-    private volatile long sslHandshakeStartedNanos;
-
-    /**
-     * The address of the client making the request. Captured in the constructor and used when calculating and capturing ssl handshake and connect
-     * timing information for SSL connections.
-     */
-    private final InetSocketAddress clientAddress;
-
-    /**
-     * Stores HTTP CONNECT timing information for this request, if it is an HTTP CONNECT.
-     */
-    private final HttpConnectTiming httpConnectTiming;
-
     /**
      * The maximum amount of time to save timing information between an HTTP CONNECT and the subsequent HTTP request. Typically this is done
      * immediately, but if for some reason it is not (e.g. due to a client crash or dropped connection), the timing information will be
@@ -93,18 +44,16 @@ public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implem
      * be recorded, but the timing information will not be populated in the HAR.
      */
     private static final int HTTP_CONNECT_TIMING_EVICTION_SECONDS = 60;
-
     /**
      * Concurrency of the httpConnectTiming map. Should be approximately equal to the maximum number of simultaneous connection
      * attempts (but not necessarily simultaneous connections). A lower value will inhibit performance.
      * TODO: tune this value for a large number of concurrent requests. develop a non-cache-based mechanism of passing ssl timings to subsequent requests.
      */
     private static final int HTTP_CONNECT_TIMING_CONCURRENCY_LEVEL = 50;
-
     /**
      * Stores SSL connection timing information from HTTP CONNNECT requests. This timing information is stored in the first HTTP request
      * after the CONNECT, not in the CONNECT itself, so it needs to be stored across requests.
-     *
+     * <p>
      * This is the only state stored across multiple requests.
      */
     private static final ConcurrentMap<InetSocketAddress, HttpConnectTiming> httpConnectTimes =
@@ -113,7 +62,46 @@ public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implem
                     .concurrencyLevel(HTTP_CONNECT_TIMING_CONCURRENCY_LEVEL)
                     .<InetSocketAddress, HttpConnectTiming>build()
                     .asMap();
-
+    /**
+     * The currently active HAR at the time the current request is received.
+     */
+    private final Har har;
+    /**
+     * The currently active page ref at the time the current request is received.
+     */
+    private final String currentPageRef;
+    /**
+     * The address of the client making the request. Captured in the constructor and used when calculating and capturing ssl handshake and connect
+     * timing information for SSL connections.
+     */
+    private final InetSocketAddress clientAddress;
+    /**
+     * Stores HTTP CONNECT timing information for this request, if it is an HTTP CONNECT.
+     */
+    private final HttpConnectTiming httpConnectTiming;
+    /**
+     * The time this CONNECT began. Used to populate the HAR entry in case of failure.
+     */
+    private volatile Date requestStartTime;
+    /**
+     * True if this filter instance processed a {@link #proxyToServerResolutionSucceeded(String, java.net.InetSocketAddress)} call, indicating
+     * that the hostname was resolved and populated in the HAR (if this is not a CONNECT).
+     */
+//    private volatile boolean addressResolved = false;
+    private volatile InetAddress resolvedAddress;
+    /**
+     * Populated by proxyToServerResolutionStarted when DNS resolution starts. If any previous filters already resolved the address, their resolution time
+     * will not be included in this time. See {@link HarCaptureFilter#dnsResolutionStartedNanos}.
+     */
+    private volatile long dnsResolutionStartedNanos;
+    private volatile long dnsResolutionFinishedNanos;
+    private volatile long connectionQueuedNanos;
+    private volatile long connectionStartedNanos;
+    private volatile long connectionSucceededTimeNanos;
+    private volatile long sendStartedNanos;
+    private volatile long sendFinishedNanos;
+    private volatile long responseReceiveStartedNanos;
+    private volatile long sslHandshakeStartedNanos;
     private volatile HttpRequest modifiedHttpRequest;
 
     public HttpConnectHarCaptureFilter(HttpRequest originalRequest, ChannelHandlerContext ctx, Har har, String currentPageRef) {
@@ -135,6 +123,16 @@ public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implem
         // create and cache an HTTP CONNECT timing object to capture timing-related information
         this.httpConnectTiming = new HttpConnectTiming();
         httpConnectTimes.put(clientAddress, httpConnectTiming);
+    }
+
+    /**
+     * Retrieves and removes (thus "consumes") the SSL timing information from the connection cache for the specified address.
+     *
+     * @param clientAddress the address of the client connection that established the HTTP tunnel
+     * @return the timing information for the tunnel previously established from the clientAddress
+     */
+    public static HttpConnectTiming consumeConnectTimingForConnection(InetSocketAddress clientAddress) {
+        return httpConnectTimes.remove(clientAddress);
     }
 
     @Override
@@ -225,7 +223,6 @@ public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implem
     public void proxyToServerConnectionQueued() {
         this.connectionQueuedNanos = System.nanoTime();
     }
-
 
     @Override
     public InetSocketAddress proxyToServerResolutionStarted(String resolvingServerHostAndPort) {
@@ -374,16 +371,6 @@ public class HttpConnectHarCaptureFilter extends HttpsAwareFiltersAdapter implem
         String url = getFullUrl(httpConnectRequest);
 
         return new HarRequest(httpConnectRequest.getMethod().toString(), url, httpConnectRequest.getProtocolVersion().text());
-    }
-
-    /**
-     * Retrieves and removes (thus "consumes") the SSL timing information from the connection cache for the specified address.
-     *
-     * @param clientAddress the address of the client connection that established the HTTP tunnel
-     * @return the timing information for the tunnel previously established from the clientAddress
-     */
-    public static HttpConnectTiming consumeConnectTimingForConnection(InetSocketAddress clientAddress) {
-        return httpConnectTimes.remove(clientAddress);
     }
 
     @Override

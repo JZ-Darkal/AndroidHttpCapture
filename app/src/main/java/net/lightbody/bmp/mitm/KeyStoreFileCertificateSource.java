@@ -2,9 +2,11 @@ package net.lightbody.bmp.mitm;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+
 import net.lightbody.bmp.mitm.exception.CertificateSourceException;
 import net.lightbody.bmp.mitm.tools.DefaultSecurityProviderTool;
 import net.lightbody.bmp.mitm.tools.SecurityProviderTool;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,8 @@ public class KeyStoreFileCertificateSource implements CertificateAndKeySource {
 
     /**
      * Creates a {@link CertificateAndKeySource} that loads an existing {@link KeyStore} from a classpath resource.
-     *  @param keyStoreType              the KeyStore type, such as PKCS12 or JKS
+     *
+     * @param keyStoreType              the KeyStore type, such as PKCS12 or JKS
      * @param keyStoreClasspathResource classpath resource to load (for example, "/keystore.jks")
      * @param privateKeyAlias           the alias of the private key in the KeyStore
      * @param keyStorePassword          te KeyStore password
@@ -70,7 +73,8 @@ public class KeyStoreFileCertificateSource implements CertificateAndKeySource {
 
     /**
      * Creates a {@link CertificateAndKeySource} that loads an existing {@link KeyStore} from a classpath resource.
-     *  @param keyStoreType     the KeyStore type, such as PKCS12 or JKS
+     *
+     * @param keyStoreType     the KeyStore type, such as PKCS12 or JKS
      * @param keyStoreFile     KeyStore file to load
      * @param privateKeyAlias  the alias of the private key in the KeyStore
      * @param keyStorePassword te KeyStore password

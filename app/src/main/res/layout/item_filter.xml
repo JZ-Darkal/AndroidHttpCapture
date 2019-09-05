@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <variable
             name="pages"
             type="cn.darkal.networkdiagnosis.Bean.ResponseFilterRule" />
@@ -10,11 +11,11 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        
+
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:checked="@={pages.enable}"/>
+            android:checked="@={pages.enable}" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,23 +24,23 @@
             android:orientation="vertical"
             android:padding="5dp">
 
-                <TextView
-                    android:id="@+id/tv_url"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{`URL地址 : ` + String.valueOf(pages.url)}"/>
+            <TextView
+                android:id="@+id/tv_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{`URL地址 : ` + String.valueOf(pages.url)}" />
 
-                <TextView
-                    android:id="@+id/tv_regex"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{`替换正则 : ` + String.valueOf(pages.replaceRegex)}"/>
+            <TextView
+                android:id="@+id/tv_regex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{`替换正则 : ` + String.valueOf(pages.replaceRegex)}" />
 
             <TextView
                 android:id="@+id/tv_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{`替换结果 : ` + String.valueOf(pages.replaceContent)}"/>
+                android:text="@{`替换结果 : ` + String.valueOf(pages.replaceContent)}" />
         </LinearLayout>
 
     </FrameLayout>

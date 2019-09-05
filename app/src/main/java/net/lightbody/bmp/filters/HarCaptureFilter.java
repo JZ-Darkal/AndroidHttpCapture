@@ -2,18 +2,7 @@ package net.lightbody.bmp.filters;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.BaseEncoding;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.LastHttpContent;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
-import io.netty.handler.codec.http.cookie.Cookie;
-import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarCookie;
 import net.lightbody.bmp.core.har.HarEntry;
@@ -27,6 +16,7 @@ import net.lightbody.bmp.filters.support.HttpConnectTiming;
 import net.lightbody.bmp.filters.util.HarCaptureUtil;
 import net.lightbody.bmp.proxy.CaptureType;
 import net.lightbody.bmp.util.BrowserMobHttpUtil;
+
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +33,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.cookie.ClientCookieDecoder;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 
 public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
     private static final Logger log = LoggerFactory.getLogger(HarCaptureFilter.class);
@@ -75,37 +78,29 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
      * The CaptureType data types to capture in this request.
      */
     private final EnumSet<CaptureType> dataToCapture;
-
-    /**
-     * Populated by proxyToServerResolutionStarted when DNS resolution starts. If any previous filters already resolved the address, their resolution time
-     * will not be included in this time.
-     */
-    private volatile long dnsResolutionStartedNanos;
-
-    private volatile long connectionQueuedNanos;
-    private volatile long connectionStartedNanos;
-
-    private volatile long sendStartedNanos;
-    private volatile long sendFinishedNanos;
-
-    private volatile long responseReceiveStartedNanos;
-
     /**
      * The address of the client making the request. Captured in the constructor and used when calculating and capturing ssl handshake and connect
      * timing information for SSL connections.
      */
     private final InetSocketAddress clientAddress;
-
     /**
      * Request body size is determined by the actual size of the data the client sends. The filter does not use the Content-Length header to determine request size.
      */
     private final AtomicInteger requestBodySize = new AtomicInteger(0);
-
     /**
      * Response body size is determined by the actual size of the data the server sends.
      */
     private final AtomicInteger responseBodySize = new AtomicInteger(0);
-
+    /**
+     * Populated by proxyToServerResolutionStarted when DNS resolution starts. If any previous filters already resolved the address, their resolution time
+     * will not be included in this time.
+     */
+    private volatile long dnsResolutionStartedNanos;
+    private volatile long connectionQueuedNanos;
+    private volatile long connectionStartedNanos;
+    private volatile long sendStartedNanos;
+    private volatile long sendFinishedNanos;
+    private volatile long responseReceiveStartedNanos;
     /**
      * The "real" original request, as captured by the {@link #clientToProxyRequest(io.netty.handler.codec.http.HttpObject)} method.
      */
@@ -123,16 +118,16 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
      * <p/>
      * Regardless of the CaptureTypes specified in <code>dataToCapture</code>, the HarCaptureFilter will always capture:
      * <ul>
-     *     <li>Request and response sizes</li>
-     *     <li>HTTP request and status lines</li>
-     *     <li>Page timing information</li>
+     * <li>Request and response sizes</li>
+     * <li>HTTP request and status lines</li>
+     * <li>Page timing information</li>
      * </ul>
      *
      * @param originalRequest the original HttpRequest from the HttpFiltersSource factory
-     * @param har a reference to the ProxyServer's current HAR file at the time this request is received (can be null if HAR capture is not required)
-     * @param currentPageRef the ProxyServer's currentPageRef at the time this request is received from the client
-     * @param dataToCapture the data types to capture for this request. null or empty set indicates only basic information will be
-     *                      captured (see {@link net.lightbody.bmp.proxy.CaptureType} for information on data collected for each CaptureType)
+     * @param har             a reference to the ProxyServer's current HAR file at the time this request is received (can be null if HAR capture is not required)
+     * @param currentPageRef  the ProxyServer's currentPageRef at the time this request is received from the client
+     * @param dataToCapture   the data types to capture for this request. null or empty set indicates only basic information will be
+     *                        captured (see {@link net.lightbody.bmp.proxy.CaptureType} for information on data collected for each CaptureType)
      */
     public HarCaptureFilter(HttpRequest originalRequest, ChannelHandlerContext ctx, Har har, String currentPageRef, Set<CaptureType> dataToCapture) {
         super(originalRequest, ctx);
@@ -408,7 +403,7 @@ public class HarCaptureFilter extends HttpsAwareFiltersAdapter {
 
         Charset charset;
         try {
-             charset = BrowserMobHttpUtil.readCharsetInContentTypeHeader(contentType);
+            charset = BrowserMobHttpUtil.readCharsetInContentTypeHeader(contentType);
         } catch (UnsupportedCharsetException e) {
             log.warn("Found unsupported character set in Content-Type header '{}' in HTTP request to {}. Content will not be captured in HAR.", contentType, httpRequest.getUri(), e);
             return;

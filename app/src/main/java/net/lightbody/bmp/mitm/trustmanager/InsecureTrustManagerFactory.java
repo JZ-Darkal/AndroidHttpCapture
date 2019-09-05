@@ -16,17 +16,18 @@
 
 package net.lightbody.bmp.mitm.trustmanager;
 
-import cn.darkal.networkdiagnosis.Utils.X509ExtendedTrustManager;
-import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
+import java.security.KeyStore;
 
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import java.security.KeyStore;
+
+import cn.darkal.networkdiagnosis.Utils.AbstractX509ExtendedTrustManager;
+import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
 
 /**
  * <b>Note:</b> This is a modified version of {@link io.netty.handler.ssl.util.InsecureTrustManagerFactory} from Netty
- * 4.0.36. Unlike the netty version, this class returns an {@link X509ExtendedTrustManager} instead of an
+ * 4.0.36. Unlike the netty version, this class returns an {@link AbstractX509ExtendedTrustManager} instead of an
  * {@link javax.net.ssl.X509TrustManager} instance, which allows us to bypass additional certificate validations.
  * <p/>
  * An insecure {@link TrustManagerFactory} that trusts all X.509 certificates without any verification.
@@ -40,7 +41,7 @@ public class InsecureTrustManagerFactory extends SimpleTrustManagerFactory {
 
     public static final TrustManagerFactory INSTANCE = new InsecureTrustManagerFactory();
 
-    public static final X509ExtendedTrustManager tm = new InsecureExtendedTrustManager();
+    public static final AbstractX509ExtendedTrustManager tm = new InsecureExtendedTrustManager();
 
     @Override
     protected void engineInit(KeyStore keyStore) throws Exception {

@@ -33,25 +33,11 @@ public class ClearTextView extends EditText {
     private int mButtonPadding = dp2px(3);
 
 
-
-
-
-    /**
-     * 按钮显示方式
-     * NEVER   不显示清空按钮
-     * ALWAYS  始终显示清空按钮
-     * WHILEEDITING   输入框内容不为空且有获得焦点
-     * UNLESSEDITING  输入框内容不为空且没有获得焦点
-     * */
-    public enum ClearButtonMode {
-        NEVER, ALWAYS, WHILEEDITING, UNLESSEDITING
-    }
-
-
     public ClearTextView(Context context) {
         super(context);
         init(context, null);
     }
+
 
     public ClearTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -62,10 +48,6 @@ public class ClearTextView extends EditText {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
-
-
-
-
 
     /**
      * 初始化
@@ -101,10 +83,9 @@ public class ClearTextView extends EditText {
         mInitPaddingRight = getPaddingRight();
     }
 
-
-
     /**
      * 按钮状态管理
+     *
      * @param canvas onDraw的Canvas
      */
     private void buttonManager(Canvas canvas) {
@@ -123,11 +104,10 @@ public class ClearTextView extends EditText {
         }
     }
 
-
-
     /**
      * 设置输入框的内边距
-     * @param isShow  是否显示按钮
+     *
+     * @param isShow 是否显示按钮
      */
     private void setPadding(boolean isShow) {
         int paddingRight = mInitPaddingRight + (isShow ? mClearButton.getWidth() + mButtonPadding + mButtonPadding : 0);
@@ -135,19 +115,18 @@ public class ClearTextView extends EditText {
         setPadding(getPaddingLeft(), getPaddingTop(), paddingRight, getPaddingBottom());
     }
 
-
-
     /**
      * 取得显示按钮与不显示按钮时的Rect
-     * @param isShow  是否显示按钮
+     *
+     * @param isShow 是否显示按钮
      */
     private Rect getRect(boolean isShow) {
         int left, top, right, bottom;
 
-        right   = isShow ? getMeasuredWidth() + getScrollX() - mButtonPadding - mButtonPadding : 0;
-        left    = isShow ? right - mClearButton.getWidth() : 0;
-        top     = isShow ? (getMeasuredHeight() - mClearButton.getHeight())/2 : 0;
-        bottom  = isShow ? top + mClearButton.getHeight() : 0;
+        right = isShow ? getMeasuredWidth() + getScrollX() - mButtonPadding - mButtonPadding : 0;
+        left = isShow ? right - mClearButton.getWidth() : 0;
+        top = isShow ? (getMeasuredHeight() - mClearButton.getHeight()) / 2 : 0;
+        bottom = isShow ? top + mClearButton.getHeight() : 0;
 
 
         //更新输入框内边距
@@ -157,10 +136,9 @@ public class ClearTextView extends EditText {
         return new Rect(left, top, right, bottom);
     }
 
-
-
     /**
      * 绘制按钮图片
+     *
      * @param canvas onDraw的Canvas
      * @param rect   图片位置
      */
@@ -169,9 +147,6 @@ public class ClearTextView extends EditText {
             canvas.drawBitmap(mClearButton, null, rect, mPaint);
         }
     }
-
-
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -194,19 +169,17 @@ public class ClearTextView extends EditText {
                     this.setText("");
                 }
                 break;
+            default:
+                break;
         }
 
         return super.onTouchEvent(event);
     }
 
-
-
-
-
-
     /**
      * 获取Drawable
-     * @param resourseId  资源ID
+     *
+     * @param resourseId 资源ID
      */
     private Drawable getDrawableCompat(int resourseId) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -218,6 +191,7 @@ public class ClearTextView extends EditText {
 
     /**
      * 设置按钮左右内边距
+     *
      * @param buttonPadding 单位为dp
      */
     public void setButtonPadding(int buttonPadding) {
@@ -226,6 +200,7 @@ public class ClearTextView extends EditText {
 
     /**
      * 设置按钮显示方式
+     *
      * @param clearButtonMode 显示方式
      */
     public void setClearButtonMode(ClearButtonMode clearButtonMode) {
@@ -239,5 +214,16 @@ public class ClearTextView extends EditText {
     public int dp2px(float dipValue) {
         final float scale = getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
+    }
+
+    /**
+     * 按钮显示方式
+     * NEVER   不显示清空按钮
+     * ALWAYS  始终显示清空按钮
+     * WHILEEDITING   输入框内容不为空且有获得焦点
+     * UNLESSEDITING  输入框内容不为空且没有获得焦点
+     */
+    public enum ClearButtonMode {
+        NEVER, ALWAYS, WHILEEDITING, UNLESSEDITING
     }
 }

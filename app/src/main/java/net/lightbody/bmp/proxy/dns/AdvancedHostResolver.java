@@ -71,7 +71,7 @@ public interface AdvancedHostResolver extends HostResolver {
      * DNS implementation. For example, the Oracle JVM's DNS cache only supports timeouts in whole seconds, so specifying a timeout of 1200ms will result
      * in a timeout of 1 second.
      *
-     * @param timeout maximum lookup time
+     * @param timeout  maximum lookup time
      * @param timeUnit units of the timeout value
      */
     void setPositiveDNSCacheTimeout(int timeout, TimeUnit timeUnit);
@@ -83,7 +83,7 @@ public interface AdvancedHostResolver extends HostResolver {
      * DNS implementation. For example, the Oracle JVM's DNS cache only supports timeouts in whole seconds, so specifying a timeout of 1200ms will result
      * in a timeout of 1 second.
      *
-     * @param timeout maximum lookup time
+     * @param timeout  maximum lookup time
      * @param timeUnit units of the timeout value
      */
     void setNegativeDNSCacheTimeout(int timeout, TimeUnit timeUnit);
