@@ -22,6 +22,7 @@ package cn.darkal.networkdiagnosis.Task;
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -88,7 +89,7 @@ public class TraceRouteWithPing {
             // Get ip when ttl exceeded
             int index = ping.indexOf(FROM_PING);
 
-            if(index==0){
+            if (index == 0) {
                 index = ping.indexOf(SMALL_FROM_PING);
             }
 
@@ -300,7 +301,7 @@ public class TraceRouteWithPing {
 
             p.destroy();
 
-            if (res.equals("")) {
+            if (TextUtils.isEmpty(res) || TextUtils.isEmpty(res.trim())) {
                 throw new IllegalArgumentException();
             }
 

@@ -24,13 +24,21 @@ public class RewriteRule {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         RewriteRule that = (RewriteRule) o;
 
-        if (!pattern.equals(that.pattern)) return false;
-        if (!replace.equals(that.replace)) return false;
+        if (!pattern.equals(that.pattern)) {
+            return false;
+        }
+        if (!replace.equals(that.replace)) {
+            return false;
+        }
 
         return true;
     }

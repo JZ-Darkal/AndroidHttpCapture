@@ -6,7 +6,9 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
+
 import com.tencent.bugly.Bugly;
+
 import net.gotev.uploadservice.UploadService;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -75,13 +77,13 @@ public class SysApplication extends MultiDexApplication {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.e("~~~","onTerminate");
+                Log.e("~~~", "onTerminate");
                 proxy.stop();
             }
         }).start();
     }
 
-    public void startProxy(){
+    public void startProxy() {
         try {
             proxy = new BrowserMobProxyServer();
             proxy.setTrustAllServers(true);
@@ -106,18 +108,18 @@ public class SysApplication extends MultiDexApplication {
 
         SharedPreferences shp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        if(shp.getBoolean("enable_filter", false)) {
+        if (shp.getBoolean("enable_filter", false)) {
             Log.e("~~~enable_filter", "");
             initResponseFilter();
         }
 
         // 设置hosts
-        if(shp.getString("system_host", "").length()>0){
+        if (shp.getString("system_host", "").length() > 0) {
             AdvancedHostResolver advancedHostResolver = proxy.getHostNameResolver();
-            for (String temp : shp.getString("system_host", "").split("\\n")){
-                if(temp.split(" ").length==2) {
-                    advancedHostResolver.remapHost(temp.split(" ")[1],temp.split(" ")[0]);
-                    Log.e("~~~~remapHost ",temp.split(" ")[1] +" " + temp.split(" ")[0]);
+            for (String temp : shp.getString("system_host", "").split("\\n")) {
+                if (temp.split(" ").length == 2) {
+                    advancedHostResolver.remapHost(temp.split(" ")[1], temp.split(" ")[0]);
+                    Log.e("~~~~remapHost ", temp.split(" ")[1] + " " + temp.split(" ")[0]);
                 }
             }
             proxy.setHostNameResolver(advancedHostResolver);
@@ -135,15 +137,15 @@ public class SysApplication extends MultiDexApplication {
         isInitProxy = true;
     }
 
-    public void stopProxy(){
-        if(proxy!=null){
+    public void stopProxy() {
+        if (proxy != null) {
             proxy.stop();
         }
     }
 
-    private void initResponseFilter(){
+    private void initResponseFilter() {
         try {
-            if(ruleList == null){
+            if (ruleList == null) {
                 ResponseFilterRule rule = new ResponseFilterRule();
                 rule.setUrl("xw.qq.com/index.htm");
                 rule.setReplaceRegex("</head>");
@@ -153,8 +155,8 @@ public class SysApplication extends MultiDexApplication {
                 ruleList.add(rule);
             }
 
-            DeviceUtils.changeResponseFilter(this,ruleList);
-        }catch (Exception e){
+            DeviceUtils.changeResponseFilter(this, ruleList);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

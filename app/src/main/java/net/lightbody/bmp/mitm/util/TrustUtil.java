@@ -2,18 +2,17 @@ package net.lightbody.bmp.mitm.util;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+
 import net.lightbody.bmp.mitm.exception.KeyStoreAccessException;
 import net.lightbody.bmp.mitm.exception.TrustSourceException;
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
 import net.lightbody.bmp.mitm.tools.DefaultSecurityProviderTool;
 import net.lightbody.bmp.mitm.tools.SecurityProviderTool;
 import net.lightbody.bmp.util.ClasspathResourceUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -28,27 +27,27 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
 /**
  * Utility class for interacting with the default trust stores on this JVM.
  */
 public class TrustUtil {
-    private static final Logger log = LoggerFactory.getLogger(TrustUtil.class);
-
-    /**
-     * Regex that matches a single certificate within a PEM file containing (potentially multiple) certificates.
-     */
-    private static final Pattern CA_PEM_PATTERN = Pattern.compile("-----BEGIN CERTIFICATE-----.+?-----END CERTIFICATE-----", Pattern.DOTALL);
-
-    /**
-     * The file containing the built-in list of trusted CAs.
-     */
-    private static final String DEFAULT_TRUSTED_CA_RESOURCE = "/cacerts.pem";
-
     /**
      * Empty X509 certificate array, useful for indicating an empty root CA trust store.
      */
     public static final X509Certificate[] EMPTY_CERTIFICATE_ARRAY = new X509Certificate[0];
-
+    private static final Logger log = LoggerFactory.getLogger(TrustUtil.class);
+    /**
+     * Regex that matches a single certificate within a PEM file containing (potentially multiple) certificates.
+     */
+    private static final Pattern CA_PEM_PATTERN = Pattern.compile("-----BEGIN CERTIFICATE-----.+?-----END CERTIFICATE-----", Pattern.DOTALL);
+    /**
+     * The file containing the built-in list of trusted CAs.
+     */
+    private static final String DEFAULT_TRUSTED_CA_RESOURCE = "/cacerts.pem";
     /**
      * Security provider used to transform PEM files into Certificates.
      * TODO: Modify the architecture of TrustUtil and TrustSource so that they do not need a hard-coded SecurityProviderTool.
@@ -103,7 +102,7 @@ public class TrustUtil {
      * Returns the list of root CAs trusted by default in this JVM, according to the TrustManager returned by
      * {@link #getDefaultJavaTrustManager()}.
      */
-    public static  X509Certificate[] getJavaTrustedCAs() {
+    public static X509Certificate[] getJavaTrustedCAs() {
         return javaTrustedCAs.get();
     }
 

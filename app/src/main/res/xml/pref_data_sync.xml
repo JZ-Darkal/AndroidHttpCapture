@@ -15,14 +15,14 @@
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="enable_filter"
-        android:title="启用返回包注入"
-        android:summary="Beta：启用该功能小概率会造成HTTPS请求返回不稳定的情况，修改该选项需要重启应用后生效"/>
+        android:summary="Beta：启用该功能小概率会造成HTTPS请求返回不稳定的情况，修改该选项需要重启应用后生效"
+        android:title="启用返回包注入" />
 
 
     <EditTextPreference
         android:key="system_host"
-        android:title="设置HOST"
-        android:summary="配置hosts，以空格分隔，每行一个，例如：\n127.0.0.1 www.darkal.cn\n127.0.0.1 darkal.cn">
+        android:summary="配置hosts，以空格分隔，每行一个，例如：\n127.0.0.1 www.darkal.cn\n127.0.0.1 darkal.cn"
+        android:title="设置HOST">
         <!--<intent android:action="android.settings.ACTION_WIFI_SETTINGS" />-->
     </EditTextPreference>
 
@@ -31,28 +31,27 @@
          design guidelines. -->
     <Preference
         android:key="install_cert"
-        android:title="@string/pref_title_cert"
-        android:summary="@string/pref_description_cert">
+        android:summary="@string/pref_description_cert"
+        android:title="@string/pref_title_cert">
         <!--<intent android:action="android.settings.SYNC_SETTINGS" />-->
     </Preference>
 
     <Preference
         android:key="system_proxy"
-        android:title="设置系统代理"
+        android:summary="通过设置系统代理可以实现抓取别的APP的请求包，请将WIFI代理服务器设置为127.0.0.1:8888"
 
-        android:summary="通过设置系统代理可以实现抓取别的APP的请求包，请将WIFI代理服务器设置为127.0.0.1:8888">
+        android:title="设置系统代理">
         <!--<intent android:action="android.settings.ACTION_WIFI_SETTINGS" />-->
     </Preference>
 
-    <PreferenceCategory
-        android:title="应用信息"/>
+    <PreferenceCategory android:title="应用信息" />
 
     <Preference
         android:key="app_host"
-        android:title="已生效HOST"/>
+        android:title="已生效HOST" />
 
     <Preference
         android:key="app_version"
-        android:title="软件版本"/>
+        android:title="软件版本" />
 
 </PreferenceScreen>

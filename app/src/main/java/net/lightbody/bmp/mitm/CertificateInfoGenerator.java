@@ -11,7 +11,7 @@ public interface CertificateInfoGenerator {
     /**
      * Generate a certificate for the specified hostnames, optionally using parameters from the originalCertificate.
      *
-     * @param hostnames the hostnames to generate the certificate for, which may include wildcards
+     * @param hostnames           the hostnames to generate the certificate for, which may include wildcards
      * @param originalCertificate original X.509 certificate sent by the upstream server, which may be null
      * @return CertificateInfo to be used to create an X509Certificate for the specified hostnames
      */

@@ -24,8 +24,8 @@ public class BlacklistEntry {
     /**
      * Creates a new BlacklistEntry which will match both a URL and an HTTP method
      *
-     * @param urlPattern URL pattern to blacklist
-     * @param statusCode status code to return for blacklisted URL
+     * @param urlPattern        URL pattern to blacklist
+     * @param statusCode        status code to return for blacklisted URL
      * @param httpMethodPattern HTTP method to match (e.g. GET, PUT, PATCH, etc.)
      */
     public BlacklistEntry(String urlPattern, int statusCode, String httpMethodPattern) {
@@ -42,7 +42,7 @@ public class BlacklistEntry {
      * Determines if this BlacklistEntry matches the given URL. Attempts to match both the URL and the
      * HTTP method.
      *
-     * @param url possibly-blacklisted URL
+     * @param url        possibly-blacklisted URL
      * @param httpMethod HTTP method this URL is being accessed with
      * @return true if the URL matches this BlacklistEntry
      */

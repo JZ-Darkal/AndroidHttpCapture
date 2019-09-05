@@ -15,14 +15,14 @@ android:
     - android-sdk-license-.+
     - '.+'
 before_script:
-    - wget http://services.gradle.org/distributions/gradle-4.4-all.zip
-    - unzip gradle-4.4-all.zip
-    - export GRADLE_HOME=$PWD/gradle-4.4
-    - export PATH=$GRADLE_HOME/bin:$PATH
-    - mkdir "$ANDROID_HOME/licenses" || true
-    - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-    - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
-    - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-    - emulator -avd test -no-audio -no-window &
-    - android-wait-for-emulator
-    - adb shell input keyevent 82 &
+  - wget http://services.gradle.org/distributions/gradle-4.4-all.zip
+  - unzip gradle-4.4-all.zip
+  - export GRADLE_HOME=$PWD/gradle-4.4
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &

@@ -1,4 +1,3 @@
-
 package com.google.zxing;
 
 import android.app.Activity;
@@ -45,6 +44,18 @@ import cn.darkal.networkdiagnosis.R;
  */
 public class QrCodeScanActivity extends Activity implements SurfaceHolder.Callback {
 
+    private static final float BEEP_VOLUME = 1.00f;
+    private static final int REQUEST_CODE_GALLERY = 0x0708;
+    private static final long VIBRATE_DURATION = 200L;
+    /**
+     * When the beep has finished playing, rewind to queue up another one.
+     */
+    private final OnCompletionListener beepListener = new OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            mediaPlayer.seekTo(0);
+        }
+    };
     private CameraManager cameraManager;
     private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
@@ -54,9 +65,7 @@ public class QrCodeScanActivity extends Activity implements SurfaceHolder.Callba
     private InactivityTimer inactivityTimer;
     private MediaPlayer mediaPlayer;
     private boolean playBeep;
-    private static final float BEEP_VOLUME = 1.00f;
     private boolean vibrate;
-    private static final int REQUEST_CODE_GALLERY = 0x0708;
 
     public CameraManager getCameraManager() {
         return cameraManager;
@@ -274,8 +283,6 @@ public class QrCodeScanActivity extends Activity implements SurfaceHolder.Callba
         }
     }
 
-    private static final long VIBRATE_DURATION = 200L;
-
     private void playBeepSoundAndVibrate() {
         if (playBeep && mediaPlayer != null) {
             mediaPlayer.start();
@@ -285,15 +292,6 @@ public class QrCodeScanActivity extends Activity implements SurfaceHolder.Callba
             vibrator.vibrate(VIBRATE_DURATION);
         }
     }
-
-    /**
-     * When the beep has finished playing, rewind to queue up another one.
-     */
-    private final OnCompletionListener beepListener = new OnCompletionListener() {
-        public void onCompletion(MediaPlayer mediaPlayer) {
-            mediaPlayer.seekTo(0);
-        }
-    };
 
     public void onGalleryClick(View view) {
         // 设定action和miniType
@@ -348,6 +346,8 @@ public class QrCodeScanActivity extends Activity implements SurfaceHolder.Callba
                         Toast.makeText(this, "未发现二维码", Toast.LENGTH_SHORT).show();
                     }
                 }
+                break;
+            default:
                 break;
         }
     }

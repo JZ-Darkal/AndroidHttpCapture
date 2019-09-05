@@ -29,16 +29,16 @@ public class HarCookie {
         return value;
     }
 
-    public String getDecodeValue(){
-        try {
-            return URLDecoder.decode(value);
-        }catch (Exception e){
-            return value;
-        }
-    }
-
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getDecodeValue() {
+        try {
+            return URLDecoder.decode(value);
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     public String getPath() {

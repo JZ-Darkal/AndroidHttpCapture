@@ -1,4 +1,4 @@
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
     <item name="ic_menu_camera" type="drawable">@drawable/ic_photo_camera_black_24dp</item>
     <item name="ic_menu_gallery" type="drawable">@drawable/ic_chrome_reader_mode_black_24dp</item>
     <item name="ic_menu_slideshow" type="drawable">@drawable/ic_developer_board_black_24dp</item>

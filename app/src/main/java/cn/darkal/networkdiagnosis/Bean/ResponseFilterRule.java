@@ -8,14 +8,8 @@ import static cn.darkal.networkdiagnosis.Bean.ResponseFilterRule.RULE_TYPE.STRIN
  * Created by darkal on 2017/5/31.
  */
 
-public class ResponseFilterRule implements Serializable{
-    enum RULE_TYPE{
-        STRING_REPLACE,
-        BEGIN_INSERT,
-        END_INSERT
-    }
-
-    private RULE_TYPE ruleType =  STRING_REPLACE;
+public class ResponseFilterRule implements Serializable {
+    private RULE_TYPE ruleType = STRING_REPLACE;
     private String url;
     private String replaceRegex;
     private String replaceContent;
@@ -59,5 +53,11 @@ public class ResponseFilterRule implements Serializable{
 
     public void setEnable(Boolean enable) {
         isEnable = enable;
+    }
+
+    enum RULE_TYPE {
+        STRING_REPLACE,
+        BEGIN_INSERT,
+        END_INSERT
     }
 }

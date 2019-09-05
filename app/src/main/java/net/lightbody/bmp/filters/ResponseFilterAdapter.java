@@ -1,14 +1,16 @@
 package net.lightbody.bmp.filters;
 
+import net.lightbody.bmp.util.HttpMessageContents;
+import net.lightbody.bmp.util.HttpMessageInfo;
+
+import org.littleshoot.proxy.HttpFilters;
+import org.littleshoot.proxy.HttpFiltersSourceAdapter;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
-import net.lightbody.bmp.util.HttpMessageContents;
-import net.lightbody.bmp.util.HttpMessageInfo;
-import org.littleshoot.proxy.HttpFilters;
-import org.littleshoot.proxy.HttpFiltersSourceAdapter;
 
 /**
  * A filter adapter for {@link ResponseFilter} implementations. Executes the filter when the {@link HttpFilters#serverToProxyResponse(HttpObject)}
@@ -85,7 +87,7 @@ public class ResponseFilterAdapter extends HttpsAwareFiltersAdapter implements M
          * be enabled if <i>any</i> filter has a maximum request or response buffer size greater than 0. See
          * {@link org.littleshoot.proxy.HttpFiltersSource#getMaximumResponseBufferSizeInBytes()} for details.)
          *
-         * @param filter ResponseFilter to invoke
+         * @param filter                           ResponseFilter to invoke
          * @param maximumResponseBufferSizeInBytes maximum buffer size when aggregating responses for filtering
          */
         public FilterSource(ResponseFilter filter, int maximumResponseBufferSizeInBytes) {

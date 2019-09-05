@@ -10,7 +10,7 @@ public class MitmConstants {
      * this question for details: http://crypto.stackexchange.com/questions/26336/sha512-faster-than-sha256. SHA384 is
      * SHA512 with a smaller output size.
      */
-    public static final String DEFAULT_MESSAGE_DIGEST = is32BitJvm() ? "SHA256": "SHA384";
+    public static final String DEFAULT_MESSAGE_DIGEST = is32BitJvm() ? "SHA256" : "SHA384";
 
     /**
      * The default {@link java.security.KeyStore} type to use when creating KeyStores (e.g. for impersonated server

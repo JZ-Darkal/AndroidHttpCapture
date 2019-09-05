@@ -3,13 +3,15 @@ package net.lightbody.bmp.filters;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HostAndPort;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpRequest;
+
 import org.littleshoot.proxy.HttpFiltersAdapter;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * Caches hostname resolutions reported by the {@link org.littleshoot.proxy.HttpFilters#proxyToServerResolutionSucceeded(String, InetSocketAddress)}
@@ -45,6 +47,16 @@ public class ResolvedHostnameCacheFilter extends HttpFiltersAdapter {
         super(originalRequest, ctx);
     }
 
+    /**
+     * Returns the (cached) address that was previously resolved for the specified host.
+     *
+     * @param host hostname that was previously resolved (without a port)
+     * @return the resolved IP address for the host, or null if the resolved address is not in the cache
+     */
+    public static String getPreviouslyResolvedAddressForHost(String host) {
+        return resolvedAddresses.getIfPresent(host);
+    }
+
     @Override
     public void proxyToServerResolutionSucceeded(String serverHostAndPort, InetSocketAddress resolvedRemoteAddress) {
         // the address *should* always be resolved at this point
@@ -59,15 +71,5 @@ public class ResolvedHostnameCacheFilter extends HttpFiltersAdapter {
                 resolvedAddresses.put(host, resolvedAddress.getHostAddress());
             }
         }
-    }
-
-    /**
-     * Returns the (cached) address that was previously resolved for the specified host.
-     *
-     * @param host hostname that was previously resolved (without a port)
-     * @return the resolved IP address for the host, or null if the resolved address is not in the cache
-     */
-    public static String getPreviouslyResolvedAddressForHost(String host) {
-        return resolvedAddresses.getIfPresent(host);
     }
 }

@@ -2,11 +2,13 @@ package net.lightbody.bmp.util;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.core.har.HarPage;
 import net.lightbody.bmp.mitm.exception.UncheckedIOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +47,7 @@ public class BrowserMobProxyUtil {
      * the specified pageRef. Does not perform a "deep copy", so any subsequent modification to the entries or pages will
      * be reflected in the copied har.
      *
-     * @param har existing har to copy
+     * @param har     existing har to copy
      * @param pageRef last page ID to copy
      * @return copy of a {@link Har} with entries and pages from the original har, or null if the input har is null
      */

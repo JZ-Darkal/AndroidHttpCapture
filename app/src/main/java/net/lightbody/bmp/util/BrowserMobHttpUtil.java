@@ -3,12 +3,10 @@ package net.lightbody.bmp.util;
 import com.google.common.io.BaseEncoding;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.MediaType;
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
+
 import net.lightbody.bmp.exception.DecompressionException;
 import net.lightbody.bmp.exception.UnsupportedCharsetException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,12 +22,15 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+
 /**
  * Utility class with static methods for processing HTTP requests and responses.
  */
 public class BrowserMobHttpUtil {
-    private static final Logger log = LoggerFactory.getLogger(BrowserMobHttpUtil.class);
-
     /**
      * Default MIME content type if no Content-Type header is present. According to the HTTP 1.1 spec, section 7.2.1:
      * <pre>
@@ -41,7 +42,6 @@ public class BrowserMobHttpUtil {
      * </pre>
      */
     public static final String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
-
     /**
      * The default charset when the Content-Type header does not specify a charset. According to RFC 7231 Appendix B:
      * <pre>
@@ -50,16 +50,16 @@ public class BrowserMobHttpUtil {
      *     Likewise, special treatment of ISO-8859-1 has been removed from the
      *     Accept-Charset header field.
      * </pre>
-     *
+     * <p>
      * Technically, we would have to determine the charset on a per-content-type basis, but generally speaking, UTF-8 is a
      * pretty safe default. (NOTE: In the previous HTTP/1.1 spec, section 3.7.1, the default charset was defined as ISO-8859-1.)
      */
     public static final Charset DEFAULT_HTTP_CHARSET = StandardCharsets.UTF_8;
-
     /**
      * Buffer size when decompressing content.
      */
     public static final int DECOMPRESS_BUFFER_SIZE = 16192;
+    private static final Logger log = LoggerFactory.getLogger(BrowserMobHttpUtil.class);
 
     /**
      * Returns the size of the headers, including the 2 CRLFs at the end of the header block.
@@ -83,13 +83,13 @@ public class BrowserMobHttpUtil {
      * @return decompressed bytes
      * @throws DecompressionException thrown if the fullMessage cannot be read or decompressed for any reason
      */
-    public static byte[] decompressContents(byte[] fullMessage,String type) throws DecompressionException {
+    public static byte[] decompressContents(byte[] fullMessage, String type) throws DecompressionException {
         InflaterInputStream reader = null;
         ByteArrayOutputStream uncompressed;
         try {
-            if(type.equalsIgnoreCase(HttpHeaders.Values.GZIP)) {
+            if (type.equalsIgnoreCase(HttpHeaders.Values.GZIP)) {
                 reader = new GZIPInputStream(new ByteArrayInputStream(fullMessage));
-            }else if(type.equalsIgnoreCase(HttpHeaders.Values.DEFLATE)) {
+            } else if (type.equalsIgnoreCase(HttpHeaders.Values.DEFLATE)) {
                 reader = new InflaterInputStream(new ByteArrayInputStream(fullMessage), new Inflater(true));
             }
 
@@ -135,11 +135,11 @@ public class BrowserMobHttpUtil {
     public static boolean hasTextualContent(String contentType) {
         return contentType != null &&
                 (contentType.startsWith("text/") ||
-                contentType.startsWith("application/x-javascript") ||
-                contentType.startsWith("application/javascript")  ||
-                contentType.startsWith("application/json")  ||
-                contentType.startsWith("application/xml")  ||
-                contentType.startsWith("application/xhtml+xml")
+                        contentType.startsWith("application/x-javascript") ||
+                        contentType.startsWith("application/javascript") ||
+                        contentType.startsWith("application/json") ||
+                        contentType.startsWith("application/xml") ||
+                        contentType.startsWith("application/xhtml+xml")
                 );
     }
 
@@ -190,7 +190,7 @@ public class BrowserMobHttpUtil {
 
         MediaType mediaType;
         try {
-             mediaType = MediaType.parse(contentTypeHeader);
+            mediaType = MediaType.parse(contentTypeHeader);
         } catch (IllegalArgumentException e) {
             log.info("Unable to parse Content-Type header: {}. Content-Type header will be ignored.", contentTypeHeader, e);
             return null;
@@ -275,7 +275,7 @@ public class BrowserMobHttpUtil {
      * parsing the hostname, but makes no guarantees. In general, it should be validated externally, if necessary.
      *
      * @param hostWithPort string containing a hostname and optional port
-     * @param portNumber port to remove from the string
+     * @param portNumber   port to remove from the string
      * @return string with the specified port removed, or the original string if it did not contain the portNumber
      */
     public static String removeMatchingPort(String hostWithPort, int portNumber) {

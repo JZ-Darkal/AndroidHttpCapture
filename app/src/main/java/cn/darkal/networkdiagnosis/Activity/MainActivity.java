@@ -75,8 +75,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.darkal.networkdiagnosis.Adapter.PageFilterAdapter;
 import cn.darkal.networkdiagnosis.Bean.PageBean;
-import cn.darkal.networkdiagnosis.Fragment.BaseFragment;
 import cn.darkal.networkdiagnosis.Fragment.BackHandledInterface;
+import cn.darkal.networkdiagnosis.Fragment.BaseFragment;
 import cn.darkal.networkdiagnosis.Fragment.NetworkFragment;
 import cn.darkal.networkdiagnosis.Fragment.PreviewFragment;
 import cn.darkal.networkdiagnosis.Fragment.WebViewFragment;
@@ -101,51 +101,99 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public final static int TYPE_NONE = 0;
     public final static int TYPE_SHARE = 1;
     public final static int TYPE_UPLOAD = 2;
-
-    private int mLastHeightOfContainer; // 记录容器上一次的高度,用于检测高度变化
-    private int mHeightOfVisibility;
-    Boolean isKeyboardOpen = false;
-    Boolean shouldExitSearchView = false;
-
-    private BaseFragment mBackHandedFragment;
-    private long exitTime = 0;
-
-    private Receiver receiver;
-
     @BindView(R.id.fl_contain)
     public View rootView;
-
     @BindView(R.id.nav_view)
     public NavigationView navigationView;
-
     @BindView(R.id.fab)
     public FloatingActionMenu fam;
-
     @BindView(R.id.fab_share)
     public FloatingActionButton shareFab;
-
     @BindView(R.id.fab_upload)
     public FloatingActionButton uploadFab;
-
     @BindView(R.id.fab_preview)
     public FloatingActionButton previewFab;
-
     @BindView(R.id.fab_clear)
     public FloatingActionButton clearFab;
-
-//    int lastX, lastY;
-//    Boolean isMove = false;
-
     public SearchView searchView;
     public MenuItem homeItem;
     public MenuItem searchItem;
     public MenuItem filterMenuItem;
-
     public Set<String> disablePages = new HashSet<>();
     public StringBuffer consoleLog = new StringBuffer();
-
     public SharedPreferences shp;
 
+    //    int lastX, lastY;
+//    Boolean isMove = false;
+    Boolean isKeyboardOpen = false;
+    Boolean shouldExitSearchView = false;
+    private int mLastHeightOfContainer; // 记录容器上一次的高度,用于检测高度变化
+    private int mHeightOfVisibility;
+    private BaseFragment mBackHandedFragment;
+    private long exitTime = 0;
+    private Receiver receiver;
+    private LoadingDialog loadingDialog;
+    private String[] uaItem = new String[]{"手机浏览器", "微信环境", "手Q环境"};
+    public NavigationView.OnNavigationItemSelectedListener navigationItemListener = new NavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(MenuItem item) {
+            // Handle navigation view item clicks here.
+            int id = item.getItemId();
+
+            if (!SysApplication.isInitProxy) {
+                Toast.makeText(MainActivity.this, "请等待程序初始化完成", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            switch (id) {
+                case R.id.nav_camera: {
+                    Intent intent = new Intent(MainActivity.this, QrCodeScanActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                case R.id.nav_gallery:
+                    switchContent(WebViewFragment.getInstance());
+                    break;
+                case R.id.nav_preview:
+                    switchContent(PreviewFragment.getInstance());
+                    break;
+                case R.id.nav_slideshow:
+                    switchContent(NetworkFragment.getInstance());
+                    break;
+                case R.id.nav_manage: {
+                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                case R.id.nav_ua:
+                    showUaDialog();
+                    break;
+                case R.id.nav_modify:
+                    if (shp.getBoolean("enable_filter", false)) {
+                        Intent intent = new Intent(MainActivity.this, ChangeFilterActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "请前往设置启用注入功能", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                case R.id.nav_cosole:
+                    showLogDialog();
+                    break;
+                case R.id.nav_host:
+                    showHostDialog();
+                    break;
+                case R.id.nav_page:
+                    createPage();
+                    break;
+                default:
+                    break;
+            }
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -339,13 +387,13 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.action_home){
+        if (id == R.id.action_home) {
             WebViewFragment webViewFragment = WebViewFragment.getInstance();
             webViewFragment.loadUrl(HOME_URL);
             switchContent(webViewFragment);
             return true;
         }
-        if(id == R.id.action_guide){
+        if (id == R.id.action_guide) {
             WebViewFragment webViewFragment = WebViewFragment.getInstance();
             webViewFragment.loadUrl(GUIDE_URL);
             switchContent(webViewFragment);
@@ -364,65 +412,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
         return super.onOptionsItemSelected(item);
     }
-
-    public NavigationView.OnNavigationItemSelectedListener navigationItemListener = new NavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(MenuItem item) {
-            // Handle navigation view item clicks here.
-            int id = item.getItemId();
-
-            if (!SysApplication.isInitProxy) {
-                Toast.makeText(MainActivity.this, "请等待程序初始化完成", Toast.LENGTH_LONG).show();
-                return true;
-            }
-
-            switch (id) {
-                case R.id.nav_camera: {
-                    Intent intent = new Intent(MainActivity.this, QrCodeScanActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.nav_gallery:
-                    switchContent(WebViewFragment.getInstance());
-                    break;
-                case R.id.nav_preview:
-                    switchContent(PreviewFragment.getInstance());
-                    break;
-                case R.id.nav_slideshow:
-                    switchContent(NetworkFragment.getInstance());
-                    break;
-                case R.id.nav_manage: {
-                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-                case R.id.nav_ua:
-                    showUaDialog();
-                    break;
-                case R.id.nav_modify:
-                    if (shp.getBoolean("enable_filter", false)) {
-                        Intent intent = new Intent(MainActivity.this, ChangeFilterActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(MainActivity.this, "请前往设置启用注入功能", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case R.id.nav_cosole:
-                    showLogDialog();
-                    break;
-                case R.id.nav_host:
-                    showHostDialog();
-                    break;
-                case R.id.nav_page:
-                    createPage();
-                    break;
-            }
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
-        }
-    };
 
     /**
      * 修改显示的内容 不会重新加载
@@ -500,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
 
         if (!isInstallCert) {
             Toast.makeText(this, "必须安装证书才可实现HTTPS抓包", Toast.LENGTH_LONG).show();
-            FileUtil.checkPermission(this,runnable);
+            FileUtil.checkPermission(this, runnable);
         }
     }
 
@@ -508,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 3) {
             if (resultCode == Activity.RESULT_OK) {
-                SharedPreferenceUtils.putBoolean(this,"isInstallNewCert", true);
+                SharedPreferenceUtils.putBoolean(this, "isInstallNewCert", true);
                 Toast.makeText(this, "安装成功", Toast.LENGTH_LONG).show();
 
             } else {
@@ -558,42 +547,16 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         return true;
     }
 
-    private class OnGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
-        private View mView;
-
-        public OnGlobalLayoutListener(View view) {
-            mView = view;
-        }
-
-        @Override
-        public void onGlobalLayout() {
-            int currentHeight = mView.getHeight();
-            if (currentHeight < mLastHeightOfContainer) { // 软键盘打开
-                if (mHeightOfVisibility == 0) {
-                    mHeightOfVisibility = currentHeight;
-                }
-                isKeyboardOpen = true;
-            } else if (currentHeight > mLastHeightOfContainer && mLastHeightOfContainer != 0) { // 软键盘关闭
-                isKeyboardOpen = false;
-                // 隐藏搜索框
-                if (shouldExitSearchView) {
-                    searchItem.collapseActionView();
-                }
-            }
-            mLastHeightOfContainer = currentHeight;
-        }
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         try {
             setIntent(intent);
             handleUriStartupParams();
-            if (intent.getAction().equals("android.intent.action.SEARCH")) {
+            if ("android.intent.action.SEARCH".equals(intent.getAction())) {
                 switchContent(PreviewFragment.getInstance());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -610,14 +573,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     protected void onStop() {
         unregisterReceiver(receiver);
         super.onStop();
-    }
-
-    public class Receiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            installCert();
-            Log.i("~~~~", "Receiver installCert");
-        }
     }
 
     /**
@@ -702,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
             }
         };
 
-        FileUtil.checkPermission(this,runnable);
+        FileUtil.checkPermission(this, runnable);
     }
 
     public void shareZip() {
@@ -724,46 +679,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
     public void uploadZip() {
         showUploadDialog(this);
     }
-
-    public class MyUploadDelegate implements UploadStatusDelegate {
-        @Override
-        public void onProgress(Context context, UploadInfo uploadInfo) {
-            Log.e("~~~~", uploadInfo.getProgressPercent() + "");
-        }
-
-        @Override
-        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
-            dismissLoading();
-            Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            exception.printStackTrace();
-            CrashReport.postCatchedException(exception);
-        }
-
-        @Override
-        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
-            try {
-                JSONObject jsonObject = new JSONObject(serverResponse.getBodyAsString());
-                if (jsonObject.getInt("errId") == 0) {
-                    Snackbar.make(rootView, "上传成功！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                } else if (jsonObject.getInt("errId") == 2 || jsonObject.getInt("errId") == 11004) {
-                    Snackbar.make(rootView, "验证码错误！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    showUploadDialog(MainActivity.this);
-                } else {
-                    Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                }
-            } catch (Exception e) {
-                Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-            dismissLoading();
-        }
-
-        @Override
-        public void onCancelled(Context context, UploadInfo uploadInfo) {
-            dismissLoading();
-        }
-    }
-
-    private LoadingDialog loadingDialog;
 
     public void showLoading(String text) {
         try {
@@ -808,6 +723,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         builder.setTitle("请输入验证码");
         builder.setView(textEntryView);
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int whichButton) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(edtInput.getWindowToken(), 0);
@@ -824,6 +740,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         });
 
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int whichButton) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(edtInput.getWindowToken(), 0);
@@ -934,20 +851,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         return proxy.getHar(getPageSet());
     }
 
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        int tab;
-//        if (mBackHandedFragment instanceof PreviewFragment) {
-//            tab = 3;
-//        } else if (mBackHandedFragment instanceof NetworkFragment) {
-//            tab = 2;
-//        } else {
-//            tab = 1;
-//        }
-//        outState.putInt("tab", tab);
-//        super.onSaveInstanceState(outState);
-//    }
-
     public void initFloatingActionMenu() {
         fam.setClosedOnTouchOutside(true);
         AnimatorSet set = new AnimatorSet();
@@ -969,10 +872,10 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
             public void onAnimationStart(Animator animation) {
                 fam.getMenuIconView().setImageResource(fam.isOpened()
                         ? R.drawable.ic_file_upload_white_24dp : R.drawable.ic_close_white_24dp);
-                if(mBackHandedFragment instanceof PreviewFragment){
-                    if(fam.isOpened()){
+                if (mBackHandedFragment instanceof PreviewFragment) {
+                    if (fam.isOpened()) {
                         clearFab.show(true);
-                    }else {
+                    } else {
                         clearFab.hide(true);
                     }
                 }
@@ -988,7 +891,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         shareFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showFilter(MainActivity.this,TYPE_SHARE);
+                showFilter(MainActivity.this, TYPE_SHARE);
                 fam.close(true);
             }
         });
@@ -996,7 +899,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         uploadFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showFilter(MainActivity.this,TYPE_UPLOAD);
+                showFilter(MainActivity.this, TYPE_UPLOAD);
                 fam.close(true);
             }
         });
@@ -1015,12 +918,14 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("请确认是否清除所有请求?");
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        ((SysApplication)getApplication()).proxy.getHar().getLog().clearAllEntries();
+                        ((SysApplication) getApplication()).proxy.getHar().getLog().clearAllEntries();
                         PreviewFragment.getInstance().notifyHarChange();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                     }
                 });
@@ -1028,8 +933,6 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
             }
         });
     }
-
-    private String[] uaItem = new String[]{"手机浏览器", "微信环境", "手Q环境"};
 
     public void showUaDialog() {
         DialogInterface.OnClickListener buttonListener = new ButtonOnClick();
@@ -1049,25 +952,21 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         builder.create().show();
     }
 
-    private class ButtonOnClick implements DialogInterface.OnClickListener {
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        int tab;
+//        if (mBackHandedFragment instanceof PreviewFragment) {
+//            tab = 3;
+//        } else if (mBackHandedFragment instanceof NetworkFragment) {
+//            tab = 2;
+//        } else {
+//            tab = 1;
+//        }
+//        outState.putInt("tab", tab);
+//        super.onSaveInstanceState(outState);
+//    }
 
-        private int index = -1; // 表示选项的索引
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which >= 0) {
-                index = which;
-            } else {
-                //用户单击的是【确定】按钮
-                if (which == DialogInterface.BUTTON_POSITIVE) {
-                    SharedPreferenceUtils.putString(MainActivity.this, "select_ua", index + "");
-                    WebViewFragment.getInstance().setUserAgent();
-                }
-            }
-        }
-    }
-
-    public void showLogDialog(){
+    public void showLogDialog() {
         View textEntryView = LayoutInflater.from(this).inflate(R.layout.alert_textview, null);
         TextView edtInput = (TextView) textEntryView.findViewById(R.id.tv_content);
         edtInput.setText(consoleLog);
@@ -1086,7 +985,7 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
         builder.show();
     }
 
-    public void showHostDialog(){
+    public void showHostDialog() {
         View textEntryView = LayoutInflater.from(this).inflate(R.layout.alert_edittext, null);
         final EditText editText = (EditText) textEntryView.findViewById(R.id.et_content);
 
@@ -1103,8 +1002,8 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
             public void onClick(DialogInterface dialog, int which) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-                SharedPreferenceUtils.putString(MainActivity.this, "system_host", editText.getText()+"");
-                DeviceUtils.changeHost(((SysApplication)getApplication()).proxy,editText.getText()+"");
+                SharedPreferenceUtils.putString(MainActivity.this, "system_host", editText.getText() + "");
+                DeviceUtils.changeHost(((SysApplication) getApplication()).proxy, editText.getText() + "");
             }
         });
         builder.setNegativeButton("清空", new DialogInterface.OnClickListener() {
@@ -1113,9 +1012,99 @@ public class MainActivity extends AppCompatActivity implements BackHandledInterf
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                 SharedPreferenceUtils.putString(MainActivity.this, "system_host", "");
-                DeviceUtils.changeHost(((SysApplication)getApplication()).proxy,editText.getText()+"");
+                DeviceUtils.changeHost(((SysApplication) getApplication()).proxy, editText.getText() + "");
             }
         });
         builder.show();
+    }
+
+    private class OnGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+        private View mView;
+
+        public OnGlobalLayoutListener(View view) {
+            mView = view;
+        }
+
+        @Override
+        public void onGlobalLayout() {
+            int currentHeight = mView.getHeight();
+            if (currentHeight < mLastHeightOfContainer) { // 软键盘打开
+                if (mHeightOfVisibility == 0) {
+                    mHeightOfVisibility = currentHeight;
+                }
+                isKeyboardOpen = true;
+            } else if (currentHeight > mLastHeightOfContainer && mLastHeightOfContainer != 0) { // 软键盘关闭
+                isKeyboardOpen = false;
+                // 隐藏搜索框
+                if (shouldExitSearchView) {
+                    searchItem.collapseActionView();
+                }
+            }
+            mLastHeightOfContainer = currentHeight;
+        }
+    }
+
+    public class Receiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            installCert();
+            Log.i("~~~~", "Receiver installCert");
+        }
+    }
+
+    public class MyUploadDelegate implements UploadStatusDelegate {
+        @Override
+        public void onProgress(Context context, UploadInfo uploadInfo) {
+            Log.e("~~~~", uploadInfo.getProgressPercent() + "");
+        }
+
+        @Override
+        public void onError(Context context, UploadInfo uploadInfo, ServerResponse serverResponse, Exception exception) {
+            dismissLoading();
+            Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            exception.printStackTrace();
+            CrashReport.postCatchedException(exception);
+        }
+
+        @Override
+        public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+            try {
+                JSONObject jsonObject = new JSONObject(serverResponse.getBodyAsString());
+                if (jsonObject.getInt("errId") == 0) {
+                    Snackbar.make(rootView, "上传成功！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                } else if (jsonObject.getInt("errId") == 2 || jsonObject.getInt("errId") == 11004) {
+                    Snackbar.make(rootView, "验证码错误！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    showUploadDialog(MainActivity.this);
+                } else {
+                    Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
+            } catch (Exception e) {
+                Snackbar.make(rootView, "上传失败！", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+            dismissLoading();
+        }
+
+        @Override
+        public void onCancelled(Context context, UploadInfo uploadInfo) {
+            dismissLoading();
+        }
+    }
+
+    private class ButtonOnClick implements DialogInterface.OnClickListener {
+
+        private int index = -1; // 表示选项的索引
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which >= 0) {
+                index = which;
+            } else {
+                //用户单击的是【确定】按钮
+                if (which == DialogInterface.BUTTON_POSITIVE) {
+                    SharedPreferenceUtils.putString(MainActivity.this, "select_ua", index + "");
+                    WebViewFragment.getInstance().setUserAgent();
+                }
+            }
+        }
     }
 }

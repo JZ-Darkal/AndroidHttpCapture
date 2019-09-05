@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 
+import com.netease.LDNetDiagnoUtils.LDNetUtil;
+
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.BufferedReader;
@@ -191,24 +193,16 @@ public class NetBasicInfo {
             e.printStackTrace();
         }
 
-
         return strMacAddr;
     }
+
 
     public String getApnInfo() {
         TelephonyManager tel = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
         String opCode = tel.getSimOperator();
 
-        String operatorName;
-        if (opCode.startsWith("46000") || opCode.startsWith("46002")) {
-            operatorName = "中国移动";
-        } else if (opCode.equals("46001")) {
-            operatorName = "中国联通";
-        } else if (opCode.equals("46003")) {
-            operatorName = "中国电信";
-        } else {
-            operatorName = "未知";
-        }
+        String operatorName = LDNetUtil.getMobileOperator(mContext);
+
 
         ConnectivityManager mag = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mobInfo = mag.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
@@ -291,12 +285,12 @@ public class NetBasicInfo {
                 for (Enumeration<InetAddress> ipAddr = intf.getInetAddresses(); ipAddr.hasMoreElements(); ) {
 
                     InetAddress inetAddress = ipAddr.nextElement();
-                    if(isV4) {
+                    if (isV4) {
                         // ipv4地址
                         if (!inetAddress.isLoopbackAddress() && InetAddressUtils.isIPv4Address(inetAddress.getHostAddress())) {
                             return inetAddress.getHostAddress();
                         }
-                    }else{
+                    } else {
                         // ipv6地址
                         if (!inetAddress.isLoopbackAddress() && InetAddressUtils.isIPv6Address(inetAddress.getHostAddress())) {
                             return inetAddress.getHostAddress();
@@ -310,7 +304,7 @@ public class NetBasicInfo {
         return "";
     }
 
-    private String getLocalDNS(){
+    private String getLocalDNS() {
         Process cmdProcess = null;
         BufferedReader reader = null;
         String dnsIP = "";
@@ -321,7 +315,7 @@ public class NetBasicInfo {
             return dnsIP;
         } catch (IOException e) {
             return null;
-        } finally{
+        } finally {
             try {
                 if (reader != null) {
                     reader.close();

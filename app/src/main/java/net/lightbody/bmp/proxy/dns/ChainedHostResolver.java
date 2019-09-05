@@ -25,13 +25,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p/>
  * The atomic write methods specified by AdvancedHostResolver are:
  * <ul>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#remapHost(String, String)}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#remapHosts(java.util.Map)}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#removeHostRemapping(String)}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#clearHostRemappings()}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#setNegativeDNSCacheTimeout(int, java.util.concurrent.TimeUnit)}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#setPositiveDNSCacheTimeout(int, java.util.concurrent.TimeUnit)}</li>
- *     <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#clearDNSCache()}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#remapHost(String, String)}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#remapHosts(java.util.Map)}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#removeHostRemapping(String)}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#clearHostRemappings()}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#setNegativeDNSCacheTimeout(int, java.util.concurrent.TimeUnit)}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#setPositiveDNSCacheTimeout(int, java.util.concurrent.TimeUnit)}</li>
+ * <li>{@link net.lightbody.bmp.proxy.dns.AdvancedHostResolver#clearDNSCache()}</li>
  * </ul>
  */
 public class ChainedHostResolver implements AdvancedHostResolver {

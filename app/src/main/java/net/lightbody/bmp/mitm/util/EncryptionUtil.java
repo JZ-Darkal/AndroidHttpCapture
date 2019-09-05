@@ -3,7 +3,6 @@ package net.lightbody.bmp.mitm.util;
 import net.lightbody.bmp.mitm.exception.ExportException;
 import net.lightbody.bmp.mitm.exception.ImportException;
 
-import javax.crypto.Cipher;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,6 +14,8 @@ import java.security.interfaces.DSAKey;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.util.Random;
+
+import javax.crypto.Cipher;
 
 /**
  * A collection of simple JCA-related utilities.
@@ -84,7 +85,7 @@ public class EncryptionUtil {
     /**
      * Convenience method to write PEM data to a file. The file will be encoded in the US_ASCII character set.
      *
-     * @param file file to write to
+     * @param file           file to write to
      * @param pemDataToWrite PEM data to write to the file
      */
     public static void writePemStringToFile(File file, String pemDataToWrite) {

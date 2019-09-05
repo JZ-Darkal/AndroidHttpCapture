@@ -1,11 +1,11 @@
 package net.lightbody.bmp.filters;
 
+import org.littleshoot.proxy.impl.ProxyUtils;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import org.littleshoot.proxy.HttpFiltersAdapter;
-import org.littleshoot.proxy.impl.ProxyUtils;
 
 /**
  * Captures the original host for HTTPS requests and stores the value in the ChannelHandlerContext for use by {@link HttpsAwareFiltersAdapter}

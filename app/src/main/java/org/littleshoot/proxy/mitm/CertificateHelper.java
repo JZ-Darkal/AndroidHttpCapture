@@ -1,5 +1,31 @@
 package org.littleshoot.proxy.mitm;
 
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.bc.BcX509ExtensionUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,46 +56,12 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.bc.BcX509ExtensionUtils;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public final class CertificateHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(CertificateHelper.class);
-
     public static final String PROVIDER_NAME = BouncyCastleProvider.PROVIDER_NAME;
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
+    private static final Logger log = LoggerFactory.getLogger(CertificateHelper.class);
     private static final String KEYGEN_ALGORITHM = "RSA";
-
     private static final String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
-
     /**
      * The signature algorithm starting with the message digest to use when
      * signing certificates. On 64-bit systems this should be set to SHA512, on
@@ -78,29 +70,25 @@ public final class CertificateHelper {
      * http://crypto.stackexchange.com/questions/26336/sha512-faster-than-sha256
      */
     private static final String SIGNATURE_ALGORITHM = (is32BitJvm() ? "SHA256" : "SHA512") + "WithRSAEncryption";
-
     private static final int ROOT_KEYSIZE = 2048;
-
     private static final int FAKE_KEYSIZE = 1024;
-
-    /** The milliseconds of a day */
+    /**
+     * The milliseconds of a day
+     */
     private static final long ONE_DAY = 86400000L;
-
     /**
      * Current time minus 1 year, just in case software clock goes back due to
      * time synchronization
      */
     private static final Date NOT_BEFORE = new Date(System.currentTimeMillis() - ONE_DAY * 365);
-
     /**
      * The maximum possible value in X.509 specification: 9999-12-31 23:59:59,
      * new Date(253402300799000L), but Apple iOS 8 fails with a certificate
      * expiration date grater than Mon, 24 Jan 6084 02:07:59 GMT (issue #6).
-     * 
+     * <p>
      * Hundred years in the future from starting the proxy should be enough.
      */
     private static final Date NOT_AFTER = new Date(System.currentTimeMillis() + ONE_DAY * 365 * 100);
-
     /**
      * Enforce TLS 1.2 if available, since it's not default up to Java 8.
      * <p>
@@ -120,7 +108,12 @@ public final class CertificateHelper {
      */
     private static final String SSL_CONTEXT_FALLBACK_PROTOCOL = "TLSv1";
 
-    private CertificateHelper() {}
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private CertificateHelper() {
+    }
 
     public static KeyPair generateKeyPair(int keySize)
             throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -139,7 +132,7 @@ public final class CertificateHelper {
      * if sun.arch.data.model explicitly indicates a 32-bit JVM.
      *
      * @return true if we can determine definitively that this is a 32-bit JVM,
-     *         otherwise false
+     * otherwise false
      */
     private static boolean is32BitJvm() {
         Integer bits = Integer.getInteger("sun.arch.data.model");
@@ -147,7 +140,7 @@ public final class CertificateHelper {
     }
 
     public static KeyStore createRootCertificate(Authority authority,
-            String keyStoreType) throws NoSuchAlgorithmException,
+                                                 String keyStoreType) throws NoSuchAlgorithmException,
             NoSuchProviderException, IOException,
             OperatorCreationException, CertificateException, KeyStoreException {
 
@@ -189,7 +182,7 @@ public final class CertificateHelper {
                 .getInstance(keyStoreType/* , PROVIDER_NAME */);
         result.load(null, null);
         result.setKeyEntry(authority.alias(), keyPair.getPrivate(),
-                authority.password(), new Certificate[] { cert });
+                authority.password(), new Certificate[]{cert});
         return result;
     }
 
@@ -208,8 +201,8 @@ public final class CertificateHelper {
     }
 
     public static KeyStore createServerCertificate(String commonName,
-            SubjectAlternativeNameHolder subjectAlternativeNames,
-            Authority authority, Certificate caCert, PrivateKey caPrivKey)
+                                                   SubjectAlternativeNameHolder subjectAlternativeNames,
+                                                   Authority authority, Certificate caCert, PrivateKey caPrivKey)
             throws NoSuchAlgorithmException, NoSuchProviderException,
             IOException, OperatorCreationException, CertificateException,
             InvalidKeyException, SignatureException, KeyStoreException {
@@ -242,9 +235,9 @@ public final class CertificateHelper {
         cert.verify(caCert.getPublicKey());
 
         KeyStore result = KeyStore.getInstance(KeyStore.getDefaultType()
-        /* , PROVIDER_NAME */);
+                /* , PROVIDER_NAME */);
         result.load(null, null);
-        Certificate[] chain = { cert, caCert };
+        Certificate[] chain = {cert, caCert};
         result.setKeyEntry(authority.alias(), keyPair.getPrivate(),
                 authority.password(), chain);
 
@@ -266,24 +259,24 @@ public final class CertificateHelper {
             NoSuchProviderException {
         String trustManAlg = TrustManagerFactory.getDefaultAlgorithm();
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(trustManAlg
-        /* , PROVIDER_NAME */);
+                /* , PROVIDER_NAME */);
         tmf.init(keyStore);
         return tmf.getTrustManagers();
     }
 
     public static KeyManager[] getKeyManagers(KeyStore keyStore,
-            Authority authority) throws NoSuchAlgorithmException,
+                                              Authority authority) throws NoSuchAlgorithmException,
             NoSuchProviderException, UnrecoverableKeyException,
             KeyStoreException {
         String keyManAlg = KeyManagerFactory.getDefaultAlgorithm();
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyManAlg
-        /* , PROVIDER_NAME */);
+                /* , PROVIDER_NAME */);
         kmf.init(keyStore, authority.password());
         return kmf.getKeyManagers();
     }
 
     public static SSLContext newClientContext(KeyManager[] keyManagers,
-            TrustManager[] trustManagers) throws NoSuchAlgorithmException,
+                                              TrustManager[] trustManagers) throws NoSuchAlgorithmException,
             KeyManagementException, NoSuchProviderException {
         SSLContext result = newSSLContext();
         result.init(keyManagers, trustManagers, null);
@@ -304,12 +297,12 @@ public final class CertificateHelper {
         try {
             log.debug("Using protocol {}", SSL_CONTEXT_PROTOCOL);
             return SSLContext.getInstance(SSL_CONTEXT_PROTOCOL
-            /* , PROVIDER_NAME */);
+                    /* , PROVIDER_NAME */);
         } catch (NoSuchAlgorithmException e) {
             log.warn("Protocol {} not available, falling back to {}", SSL_CONTEXT_PROTOCOL,
                     SSL_CONTEXT_FALLBACK_PROTOCOL);
             return SSLContext.getInstance(SSL_CONTEXT_FALLBACK_PROTOCOL
-            /* , PROVIDER_NAME */);
+                    /* , PROVIDER_NAME */);
         }
     }
 

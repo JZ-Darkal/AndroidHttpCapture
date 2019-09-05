@@ -19,7 +19,7 @@ public abstract class AbstractHostNameRemapper implements AdvancedHostResolver {
      * Host name remappings, maintained as a reference to an ImmutableMap. The ImmutableMap type is specified explicitly because ImmutableMap
      * guarantees the iteration order of the map's entries. Specifying ImmutableMap also makes clear that the underlying map will never change,
      * and that any modifications to the host name remappings will result in an entirely new map.
-     *
+     * <p>
      * The current implementation does not actually use any of the special features of AtomicReference, but it does rely on synchronizing on
      * the AtomicReference when performing write operations. It could be replaced by a volatile reference to a Map and separate lock object.
      */

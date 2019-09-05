@@ -1,14 +1,17 @@
 package net.lightbody.bmp.filters;
 
 import com.google.common.net.HostAndPort;
+
+import net.lightbody.bmp.util.BrowserMobHttpUtil;
+import net.lightbody.bmp.util.HttpUtil;
+
+import org.littleshoot.proxy.HttpFiltersAdapter;
+import org.littleshoot.proxy.impl.ProxyUtils;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import net.lightbody.bmp.util.HttpUtil;
-import net.lightbody.bmp.util.BrowserMobHttpUtil;
-import org.littleshoot.proxy.HttpFiltersAdapter;
-import org.littleshoot.proxy.impl.ProxyUtils;
 
 /**
  * The HttpsAwareFiltersAdapter exposes the original host and the "real" host (after filter modifications) to filters for HTTPS

@@ -1,13 +1,14 @@
 package net.lightbody.bmp.util;
 
 import com.google.common.net.HostAndPort;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpRequest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * Contains utility methods for netty {@link HttpRequest} and related objects.

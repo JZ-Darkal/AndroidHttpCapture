@@ -1,11 +1,11 @@
 package cn.darkal.networkdiagnosis.Activity;
 
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +14,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,7 +21,6 @@ import cn.darkal.networkdiagnosis.Adapter.ContentFilterAdapter;
 import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
-import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 
 public class ChangeFilterActivity extends AppCompatActivity {
@@ -44,10 +42,10 @@ public class ChangeFilterActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setupActionBar();
 
-        if(((SysApplication)getApplication()).ruleList == null){
-            contentFilterAdapter = new ContentFilterAdapter(this,new ArrayList<ResponseFilterRule>());
-        }else{
-            contentFilterAdapter = new ContentFilterAdapter(this,((SysApplication)getApplication()).ruleList);
+        if (((SysApplication) getApplication()).ruleList == null) {
+            contentFilterAdapter = new ContentFilterAdapter(this, new ArrayList<ResponseFilterRule>());
+        } else {
+            contentFilterAdapter = new ContentFilterAdapter(this, ((SysApplication) getApplication()).ruleList);
         }
 
         listView.setAdapter(contentFilterAdapter);
@@ -72,19 +70,19 @@ public class ChangeFilterActivity extends AppCompatActivity {
         }
     }
 
-    public void showDialog(final ResponseFilterRule responseFilterRule){
+    public void showDialog(final ResponseFilterRule responseFilterRule) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ChangeFilterActivity.this);
 
         View textEntryView = LayoutInflater.from(ChangeFilterActivity.this).inflate(R.layout.alert_resp_filter, null);
         final EditText urlEditText = (EditText) textEntryView.findViewById(R.id.et_origin_url);
         final EditText regexEditText = (EditText) textEntryView.findViewById(R.id.et_regex);
         final EditText contentEditText = (EditText) textEntryView.findViewById(R.id.et_replace_result);
-        if(responseFilterRule!=null){
+        if (responseFilterRule != null) {
             urlEditText.setText(responseFilterRule.getUrl());
             regexEditText.setText(responseFilterRule.getReplaceRegex());
             contentEditText.setText(responseFilterRule.getReplaceContent());
             builder.setTitle("修改注入项");
-        }else{
+        } else {
             builder.setTitle("新增注入项");
         }
 
@@ -93,13 +91,13 @@ public class ChangeFilterActivity extends AppCompatActivity {
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(responseFilterRule!=null){
+                if (responseFilterRule != null) {
                     responseFilterRule.setUrl(urlEditText.getText().toString());
                     responseFilterRule.setReplaceRegex(regexEditText.getText().toString());
                     responseFilterRule.setReplaceContent(contentEditText.getText().toString());
-                }else {
-                    if(urlEditText.getText().length()>0 && regexEditText.getText().length()>0
-                            && contentEditText.getText().length()>0) {
+                } else {
+                    if (urlEditText.getText().length() > 0 && regexEditText.getText().length() > 0
+                            && contentEditText.getText().length() > 0) {
                         ResponseFilterRule responseFilterRule = new ResponseFilterRule();
                         responseFilterRule.setUrl(urlEditText.getText().toString());
                         responseFilterRule.setReplaceRegex(regexEditText.getText().toString());
@@ -110,14 +108,14 @@ public class ChangeFilterActivity extends AppCompatActivity {
                 contentFilterAdapter.notifyDataSetChanged();
             }
         });
-        builder.setNegativeButton("取消",null);
+        builder.setNegativeButton("取消", null);
         builder.show();
     }
 
     @Override
     protected void onStop() {
         SharedPreferenceUtils.save(getApplicationContext(),
-                "response_filter",((SysApplication) getApplication()).ruleList);
+                "response_filter", ((SysApplication) getApplication()).ruleList);
         super.onStop();
     }
 

@@ -1,5 +1,14 @@
 package net.lightbody.bmp.filters;
 
+import net.lightbody.bmp.util.BrowserMobHttpUtil;
+
+import org.littleshoot.proxy.HttpFiltersAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpContent;
@@ -8,13 +17,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
-import net.lightbody.bmp.util.BrowserMobHttpUtil;
-import org.littleshoot.proxy.HttpFiltersAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * This filter captures responses from the server (headers and content). The filter can also decompress contents if desired.
@@ -25,48 +27,40 @@ import java.io.IOException;
  */
 public class ServerResponseCaptureFilter extends HttpFiltersAdapter {
     private static final Logger log = LoggerFactory.getLogger(ServerResponseCaptureFilter.class);
-
-    /**
-     * Populated by serverToProxyResponse() when processing the HttpResponse object
-     */
-    private volatile HttpResponse httpResponse;
-
     /**
      * Populated by serverToProxyResponse() as it receives HttpContent responses. If the response is chunked, it will
      * be populated across multiple calls to proxyToServerResponse().
      */
     private final ByteArrayOutputStream rawResponseContents = new ByteArrayOutputStream();
-
+    /**
+     * User option indicating compressed content should be uncompressed.
+     */
+    private final boolean decompressEncodedContent;
+    /**
+     * Populated by serverToProxyResponse() when processing the HttpResponse object
+     */
+    private volatile HttpResponse httpResponse;
     /**
      * Populated when processing the LastHttpContent. If the response is compressed and decompression is requested,
      * this contains the entire decompressed response. Otherwise it contains the raw response.
      */
     private volatile byte[] fullResponseContents;
-
     /**
      * Populated by serverToProxyResponse() when it processes the LastHttpContent object.
      */
     private volatile HttpHeaders trailingHeaders;
-
     /**
      * Set to true when processing the LastHttpContent if the server indicates there is a content encoding.
      */
     private volatile boolean responseCompressed;
-
     /**
      * Set to true when processing the LastHttpContent if decompression was requested and successful.
      */
     private volatile boolean decompressionSuccessful;
-
     /**
      * Populated when processing the LastHttpContent.
      */
     private volatile String contentEncoding;
-
-    /**
-     * User option indicating compressed content should be uncompressed.
-     */
-    private final boolean decompressEncodedContent;
 
     public ServerResponseCaptureFilter(HttpRequest originalRequest, boolean decompressEncodedContent) {
         super(originalRequest);
@@ -116,7 +110,7 @@ public class ServerResponseCaptureFilter extends HttpFiltersAdapter {
 
             if (decompressEncodedContent) {
                 decompressContents();
-            }  else {
+            } else {
                 // will not decompress response
             }
         } else {
@@ -128,12 +122,12 @@ public class ServerResponseCaptureFilter extends HttpFiltersAdapter {
     protected void decompressContents() {
         if (contentEncoding.equalsIgnoreCase(HttpHeaders.Values.GZIP) || contentEncoding.equalsIgnoreCase(HttpHeaders.Values.DEFLATE)) {
             try {
-                fullResponseContents = BrowserMobHttpUtil.decompressContents(getRawResponseContents(),contentEncoding);
+                fullResponseContents = BrowserMobHttpUtil.decompressContents(getRawResponseContents(), contentEncoding);
                 decompressionSuccessful = true;
             } catch (RuntimeException e) {
                 log.warn("Failed to decompress response with encoding type " + contentEncoding + " when decoding request from " + originalRequest.getUri(), e);
             }
-        }  else{
+        } else {
             log.warn("Cannot decode unsupported content encoding type {}", contentEncoding);
         }
     }

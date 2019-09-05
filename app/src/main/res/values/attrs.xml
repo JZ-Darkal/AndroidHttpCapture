@@ -13,6 +13,6 @@
             <!--不为空，且不在编译状态时（焦点不在输入框上）显示清空按钮-->
             <enum name="unlessEditing" value="3" />
         </attr>
-        <attr name="clearButtonDrawable" format="reference"/>
+        <attr name="clearButtonDrawable" format="reference" />
     </declare-styleable>
 </resources>

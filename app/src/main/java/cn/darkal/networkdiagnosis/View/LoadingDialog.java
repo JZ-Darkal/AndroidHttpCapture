@@ -23,6 +23,7 @@ public class LoadingDialog extends ProgressDialog {
     private boolean mSingleLine;
     private Context mContext;
     private ProgressWheel mProgressWheel;
+
     public LoadingDialog(Context context) {
         super(context, R.style.JzAlertDialogWhite);
     }
@@ -52,7 +53,7 @@ public class LoadingDialog extends ProgressDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_loading2_dialog);
         TextView mMessage = (TextView) findViewById(R.id.loading_dialog_message);
-        if ((mText == null) || (mText.equals(""))) {
+        if (TextUtils.isEmpty(mText)) {
             mMessage.setVisibility(View.GONE);
         } else {
             mMessage.setVisibility(View.VISIBLE);
@@ -96,7 +97,7 @@ public class LoadingDialog extends ProgressDialog {
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if(mProgressWheel != null) {
+        if (mProgressWheel != null) {
             mProgressWheel.spin();
         }
     }
@@ -104,7 +105,7 @@ public class LoadingDialog extends ProgressDialog {
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if(mProgressWheel != null) {
+        if (mProgressWheel != null) {
             mProgressWheel.stopSpinning();
         }
     }

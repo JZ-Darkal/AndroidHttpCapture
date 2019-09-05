@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -39,6 +38,7 @@ public class JsonPreviewActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
     private String content;
     private int selectedEncode = 0;
+    private String[] encodeItem = new String[]{"UTF-8", "ISO-8859-1", "GBK"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +52,13 @@ public class JsonPreviewActivity extends AppCompatActivity {
         setupActionBar();
 
         try {
-            int pos = getIntent().getIntExtra("pos",-1);
-            if(pos > -1){
+            int pos = getIntent().getIntExtra("pos", -1);
+            if (pos > -1) {
                 HarLog harLog = ((SysApplication) getApplication()).proxy.getHar().getLog();
                 HarEntry harEntry = harLog.getEntries().get(pos);
                 content = harEntry.getResponse().getContent().getText();
                 initViewDelay(content);
-            }else{
+            } else {
                 finish();
             }
         } catch (Exception e) {
@@ -120,8 +120,6 @@ public class JsonPreviewActivity extends AppCompatActivity {
         return gson.toJson(je);
     }
 
-    private String[] encodeItem = new String[]{"UTF-8", "ISO-8859-1", "GBK"};
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.json_menu, menu);
@@ -131,9 +129,9 @@ public class JsonPreviewActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 DialogInterface.OnClickListener listener = new ButtonOnClick();
                 AlertDialog.Builder builder = new AlertDialog.Builder(JsonPreviewActivity.this);
-                builder.setNegativeButton("取消",null);
+                builder.setNegativeButton("取消", null);
                 builder.setPositiveButton("确认", listener);
-                builder.setSingleChoiceItems(encodeItem,selectedEncode,listener);
+                builder.setSingleChoiceItems(encodeItem, selectedEncode, listener);
                 builder.create().show();
                 return true;
             }
@@ -141,6 +139,24 @@ public class JsonPreviewActivity extends AppCompatActivity {
 
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void changeEncode(int pos) {
+        switch (pos) {
+            case 0:
+                initViewDelay(content);
+                break;
+            case 1:
+                initViewDelay(new String(content.getBytes(Charset.forName("ISO-8859-1")), Charset.forName("UTF-8")));
+                break;
+            case 2:
+                initViewDelay(new String(content.getBytes(Charset.forName("GBK")), Charset.forName("UTF-8")));
+                break;
+            default:
+                initViewDelay(content);
+                break;
+        }
+
     }
 
     private class ButtonOnClick implements DialogInterface.OnClickListener {
@@ -159,23 +175,5 @@ public class JsonPreviewActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    public void changeEncode(int pos){
-        switch (pos){
-            case 0:
-                initViewDelay(content);
-                break;
-            case 1:
-                initViewDelay(new String(content.getBytes(Charset.forName("ISO-8859-1")), Charset.forName("UTF-8")));
-                break;
-            case 2:
-                initViewDelay(new String(content.getBytes(Charset.forName("GBK")), Charset.forName("UTF-8")));
-                break;
-            default:
-                initViewDelay(content);
-                break;
-        }
-
     }
 }

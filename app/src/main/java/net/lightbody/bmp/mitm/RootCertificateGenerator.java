@@ -2,12 +2,14 @@ package net.lightbody.bmp.mitm;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+
 import net.lightbody.bmp.mitm.keys.KeyGenerator;
 import net.lightbody.bmp.mitm.keys.RSAKeyGenerator;
 import net.lightbody.bmp.mitm.tools.DefaultSecurityProviderTool;
 import net.lightbody.bmp.mitm.tools.SecurityProviderTool;
 import net.lightbody.bmp.mitm.util.EncryptionUtil;
 import net.lightbody.bmp.mitm.util.MitmConstants;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +36,14 @@ import java.util.Date;
  */
 public class RootCertificateGenerator implements CertificateAndKeySource {
     private static final Logger log = LoggerFactory.getLogger(RootCertificateGenerator.class);
-
-    private final CertificateInfo rootCertificateInfo;
-
-    private final String messageDigest;
-
-    private final KeyGenerator keyGenerator;
-
-    private final SecurityProviderTool securityProviderTool;
-
     /**
      * The default algorithm to use when encrypting objects in PEM files (such as private keys).
      */
     private static final String DEFAULT_PEM_ENCRYPTION_ALGORITHM = "AES-128-CBC";
-
+    private final CertificateInfo rootCertificateInfo;
+    private final String messageDigest;
+    private final KeyGenerator keyGenerator;
+    private final SecurityProviderTool securityProviderTool;
     /**
      * The new root certificate and private key are generated only once, even across multiple calls to {@link #load()}},
      * to allow users to save the new generated root certificate for use in browsers/other HTTP clients.
@@ -83,6 +79,34 @@ public class RootCertificateGenerator implements CertificateAndKeySource {
         this.messageDigest = messageDigest;
         this.keyGenerator = keyGenerator;
         this.securityProviderTool = securityProviderTool;
+    }
+
+    /**
+     * Convenience method to return a new {@link Builder} instance.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a default CN field for a certificate, using the hostname of this machine and the current time.
+     */
+    private static String getDefaultCommonName() {
+        String hostname;
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostname = "localhost";
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
+
+        String currentDateTime = dateFormat.format(new Date());
+
+        String defaultCN = "Generated CA (" + hostname + ") " + currentDateTime;
+
+        // CN fields can only be 64 characters
+        return defaultCN.length() <= 64 ? defaultCN : defaultCN.substring(0, 63);
     }
 
     @Override
@@ -176,13 +200,6 @@ public class RootCertificateGenerator implements CertificateAndKeySource {
     }
 
     /**
-     * Convenience method to return a new {@link Builder} instance.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
      * A Builder for {@link RootCertificateGenerator}s. Initialized with suitable default values suitable for most purposes.
      */
     public static class Builder {
@@ -234,26 +251,5 @@ public class RootCertificateGenerator implements CertificateAndKeySource {
         public RootCertificateGenerator build() {
             return new RootCertificateGenerator(certificateInfo, messageDigest, keyGenerator, securityProviderTool);
         }
-    }
-
-    /**
-     * Creates a default CN field for a certificate, using the hostname of this machine and the current time.
-     */
-    private static String getDefaultCommonName() {
-        String hostname;
-        try {
-            hostname = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            hostname = "localhost";
-        }
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
-
-        String currentDateTime = dateFormat.format(new Date());
-
-        String defaultCN = "Generated CA (" + hostname + ") " + currentDateTime;
-
-        // CN fields can only be 64 characters
-        return defaultCN.length() <= 64 ? defaultCN : defaultCN.substring(0, 63);
     }
 }

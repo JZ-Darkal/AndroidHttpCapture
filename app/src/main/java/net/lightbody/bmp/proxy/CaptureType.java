@@ -21,7 +21,6 @@ public enum CaptureType {
      * Non-binary HTTP request content, such as post data or other text-based request payload.
      * See {@link net.lightbody.bmp.util.BrowserMobHttpUtil#hasTextualContent(String)} for a list of Content-Types that
      * are considered non-binary.
-     *
      */
     REQUEST_CONTENT,
 

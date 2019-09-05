@@ -6,7 +6,7 @@ import java.io.File;
 
 /**
  * Parameter object holding personal informations given to a SSLEngineSource.
- * 
+ * <p>
  * XXX consider to inline within the interface SslEngineSource, if MITM is core
  */
 public class Authority {
@@ -37,7 +37,7 @@ public class Authority {
         password = "Be Your Own Lantern".toCharArray();
         organization = "LittleProxy-mitm"; // proxy name
         commonName = organization + ", describe proxy here"; // MITM is bad
-                                                             // normally
+        // normally
         organizationalUnitName = "Certificate Authority";
         certOrganization = organization; // proxy name
         certOrganizationalUnitName = organization
@@ -49,9 +49,9 @@ public class Authority {
      * authority informations
      */
     public Authority(File keyStoreDir, String alias, char[] password,
-            String commonName, String organization,
-            String organizationalUnitName, String certOrganization,
-            String certOrganizationalUnitName) {
+                     String commonName, String organization,
+                     String organizationalUnitName, String certOrganization,
+                     String certOrganizationalUnitName) {
         super();
         this.keyStoreDir = keyStoreDir;
         this.alias = alias;

@@ -8,12 +8,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HarResponse {
-    private volatile int status;
-    private volatile String statusText;
-    private volatile String httpVersion;
     private final List<HarCookie> cookies = new CopyOnWriteArrayList<HarCookie>();
     private final List<HarNameValuePair> headers = new CopyOnWriteArrayList<HarNameValuePair>();
     private final HarContent content = new HarContent();
+    private volatile int status;
+    private volatile String statusText;
+    private volatile String httpVersion;
     private volatile String redirectURL = "";
 
     /* the values of headersSize and bodySize are set to -1 by default, in accordance with the HAR spec:

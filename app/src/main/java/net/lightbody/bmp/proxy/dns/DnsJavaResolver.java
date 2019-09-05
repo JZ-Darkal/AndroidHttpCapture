@@ -1,6 +1,7 @@
 package net.lightbody.bmp.proxy.dns;
 
 import com.google.common.net.InetAddresses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.AAAARecord;
@@ -28,16 +29,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class DnsJavaResolver extends AbstractHostNameRemapper implements AdvancedHostResolver {
     private static final Logger log = LoggerFactory.getLogger(DnsJavaResolver.class);
-
-    /**
-     * DNS cache used for dnsjava lookups.
-     */
-    private final Cache cache = new Cache();
-
     /**
      * Maximum number of times to retry a DNS lookup due to a failure to connect to the DNS server.
      */
     private static final int DNS_NETWORK_FAILURE_RETRY_COUNT = 5;
+    /**
+     * DNS cache used for dnsjava lookups.
+     */
+    private final Cache cache = new Cache();
 
     @Override
     public void clearDNSCache() {

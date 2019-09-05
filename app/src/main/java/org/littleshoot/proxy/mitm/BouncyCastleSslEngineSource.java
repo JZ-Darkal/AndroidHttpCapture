@@ -1,6 +1,14 @@
 package org.littleshoot.proxy.mitm;
 
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.littleshoot.proxy.SslEngineSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,28 +36,20 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManager;
 
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.littleshoot.proxy.SslEngineSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 /**
  * A {@link SslEngineSource} which creates a key store with a Root Certificate
  * Authority. The certificates are generated lazily if the given key store file
  * doesn't yet exist.
- * 
+ * <p>
  * The root certificate is exported in PEM format to be used in a browser. The
  * proxy application presents for every host a dynamically created certificate
  * to the browser, signed by this certificate authority.
- * 
+ * <p>
  * This facilitates the proxy to handle as a "Man In The Middle" to filter the
  * decrypted content in clear text.
- * 
+ * <p>
  * The hard part was done by mawoki. It's derived from Zed Attack Proxy (ZAP).
  * ZAP is an HTTP/HTTPS proxy for assessing web application security. Copyright
  * 2011 mawoki@ymail.com Licensed under the Apache License, Version 2.0
@@ -84,24 +84,19 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
      * initializes a SSL context. Exceptions will be thrown to let the manager
      * decide how to react. Don't install a MITM manager in the proxy in case of
      * a failure.
-     * 
-     * @param authority
-     *            a parameter object to provide personal informations of the
-     *            Certificate Authority and the dynamic certificates.
-     * 
+     *
+     * @param authority       a parameter object to provide personal informations of the
+     *                        Certificate Authority and the dynamic certificates.
      * @param trustAllServers
-     * 
      * @param sendCerts
-     * 
-     * @param sslContexts
-     *            a cache to store dynamically created server certificates.
-     *            Generation takes between 50 to 500ms, but only once per
-     *            thread, since there is a connection cache too. It's save to
-     *            give a null cache to prevent memory or locking issues.
+     * @param sslContexts     a cache to store dynamically created server certificates.
+     *                        Generation takes between 50 to 500ms, but only once per
+     *                        thread, since there is a connection cache too. It's save to
+     *                        give a null cache to prevent memory or locking issues.
      */
     public BouncyCastleSslEngineSource(Authority authority,
-            boolean trustAllServers, boolean sendCerts,
-            Cache<String, SSLContext> sslContexts)
+                                       boolean trustAllServers, boolean sendCerts,
+                                       Cache<String, SSLContext> sslContexts)
             throws GeneralSecurityException, OperatorCreationException,
             RootCertificateException, IOException {
         this.authority = authority;
@@ -118,17 +113,14 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
      * dynamically created server certificates. Exceptions will be thrown to let
      * the manager decide how to react. Don't install a MITM manager in the
      * proxy in case of a failure.
-     * 
-     * @param authority
-     *            a parameter object to provide personal informations of the
-     *            Certificate Authority and the dynamic certificates.
-     * 
+     *
+     * @param authority       a parameter object to provide personal informations of the
+     *                        Certificate Authority and the dynamic certificates.
      * @param trustAllServers
-     * 
      * @param sendCerts
      */
     public BouncyCastleSslEngineSource(Authority authority,
-            boolean trustAllServers, boolean sendCerts)
+                                       boolean trustAllServers, boolean sendCerts)
             throws RootCertificateException, GeneralSecurityException,
             IOException, OperatorCreationException {
         this(authority, trustAllServers, sendCerts,
@@ -145,7 +137,9 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
     private void filterWeakCipherSuites(SSLEngine sslEngine) {
         List<String> ciphers = new LinkedList<String>();
         for (String each : sslEngine.getEnabledCipherSuites()) {
-            if (each.equals("TLS_DHE_RSA_WITH_AES_128_CBC_SHA") || each.equals("TLS_DHE_RSA_WITH_AES_256_CBC_SHA")) {
+            if ("TLS_DHE_RSA_WITH_AES_128_CBC_SHA".equals(each)
+                    || "TLS_DHE_RSA_WITH_AES_256_CBC_SHA".equals(each)
+            ) {
                 LOG.debug("Removed cipher {}", each);
             } else {
                 ciphers.add(each);
@@ -166,6 +160,7 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
         }
     }
 
+    @Override
     public SSLEngine newSslEngine() {
         SSLEngine sslEngine = sslContext.createSSLEngine();
         filterWeakCipherSuites(sslEngine);
@@ -246,7 +241,7 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
             trustManagers = InsecureTrustManagerFactory.INSTANCE
                     .getTrustManagers();
         } else {
-            trustManagers = new TrustManager[] { new MergeTrustManager(ks) };
+            trustManagers = new TrustManager[]{new MergeTrustManager(ks)};
         }
 
         KeyManager[] keyManagers;
@@ -282,25 +277,17 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
      * Generates an 1024 bit RSA key pair using SHA1PRNG. Thoughts: 2048 takes
      * much longer time on older CPUs. And for almost every client, 1024 is
      * sufficient.
-     * 
+     * <p>
      * Derived from Zed Attack Proxy (ZAP). ZAP is an HTTP/HTTPS proxy for
      * assessing web application security. Copyright 2011 mawoki@ymail.com
      * Licensed under the Apache License, Version 2.0
-     * 
-     * @param commonName
-     *            the common name to use in the server certificate
-     * 
-     * @param subjectAlternativeNames
-     *            a List of the subject alternative names to use in the server
-     *            certificate, could be empty, but must not be null
-     * 
-     * @see org.parosproxy.paros.security.SslCertificateServiceImpl.
-     *      createCertForHost(String)
-     * @see org.parosproxy.paros.network.SSLConnector.getTunnelSSLSocketFactory(
-     *      String)
+     *
+     * @param commonName              the common name to use in the server certificate
+     * @param subjectAlternativeNames a List of the subject alternative names to use in the server
+     *                                certificate, could be empty, but must not be null
      */
     public SSLEngine createCertForHost(final String commonName,
-            final SubjectAlternativeNameHolder subjectAlternativeNames)
+                                       final SubjectAlternativeNameHolder subjectAlternativeNames)
             throws GeneralSecurityException, OperatorCreationException,
             IOException, ExecutionException {
         if (commonName == null) {
@@ -328,7 +315,7 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
     }
 
     private SSLContext createServerContext(String commonName,
-            SubjectAlternativeNameHolder subjectAlternativeNames)
+                                           SubjectAlternativeNameHolder subjectAlternativeNames)
             throws GeneralSecurityException, IOException,
             OperatorCreationException {
 
@@ -346,7 +333,7 @@ public class BouncyCastleSslEngineSource implements SslEngineSource {
     }
 
     public void initializeServerCertificates(String commonName,
-            SubjectAlternativeNameHolder subjectAlternativeNames)
+                                             SubjectAlternativeNameHolder subjectAlternativeNames)
             throws GeneralSecurityException, OperatorCreationException,
             IOException {
 

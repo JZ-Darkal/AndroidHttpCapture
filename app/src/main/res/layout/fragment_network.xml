@@ -1,82 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:paddingBottom="@dimen/activity_vertical_margin">
 
     <cn.darkal.networkdiagnosis.View.ClearTextView
         android:id="@+id/et_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="90dp"
-        android:text="www.darkal.cn"
         android:inputType="textUri"
-        app:clearButtonMode="whileEditing"/>
+        android:text="www.darkal.cn"
+        app:clearButtonMode="whileEditing" />
 
     <Button
-        android:layout_alignParentRight="true"
         android:id="@+id/bt_trace"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:text="开始诊断"
         app:layout_columnWeight="1"
-        app:layout_rowWeight="1"
-        android:text="开始诊断"/>
+        app:layout_rowWeight="1" />
 
     <android.support.v7.widget.GridLayout
         android:id="@+id/gl_tool"
-        android:layout_below="@id/et_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/et_url"
         android:layout_gravity="fill"
-        app:columnCount="2"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:columnCount="2">
 
         <Button
             android:id="@+id/bt_ping"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:text="PING"
             app:layout_columnWeight="1"
-            app:layout_rowWeight="1"
-            android:text="PING"/>
+            app:layout_rowWeight="1" />
 
         <Button
             android:id="@+id/bt_dns"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:text="DNS"
             app:layout_columnWeight="1"
-            app:layout_rowWeight="1"
-            android:text="DNS"/>
+            app:layout_rowWeight="1" />
 
         <Button
             android:id="@+id/bt_trace1"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:text="TRACE"
             app:layout_columnWeight="1"
-            app:layout_rowWeight="1"
-            android:text="TRACE"/>
+            app:layout_rowWeight="1" />
 
         <Button
             android:id="@+id/bt_info"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:text="INFO"
             app:layout_columnWeight="1"
-            app:layout_rowWeight="1"
-            android:text="INFO"/>
+            app:layout_rowWeight="1" />
 
 
     </android.support.v7.widget.GridLayout>
 
 
-
     <ScrollView
-        android:layout_below="@id/gl_tool"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/gl_tool"
         android:background="#eeeeee"
         android:scrollbars="none">
 
@@ -88,6 +86,6 @@
             android:text="no detect result"
             android:textColor="#ff000000"
             android:textIsSelectable="true"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
     </ScrollView>
 </RelativeLayout>
