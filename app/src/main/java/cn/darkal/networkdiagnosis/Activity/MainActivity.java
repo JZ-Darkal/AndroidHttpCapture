@@ -74,7 +74,7 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.darkal.networkdiagnosis.Adapter.PageFilterAdapter;
-import cn.darkal.networkdiagnosis.Bean.PageBean;
+import cn.darkal.networkdiagnosis.bean.PageBean;
 import cn.darkal.networkdiagnosis.Fragment.BaseFragment;
 import cn.darkal.networkdiagnosis.Fragment.BackHandledInterface;
 import cn.darkal.networkdiagnosis.Fragment.NetworkFragment;

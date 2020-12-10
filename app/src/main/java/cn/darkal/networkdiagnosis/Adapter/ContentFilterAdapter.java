@@ -12,14 +12,9 @@ import android.widget.BaseAdapter;
 import java.util.List;
 
 import cn.darkal.networkdiagnosis.Activity.ChangeFilterActivity;
-import cn.darkal.networkdiagnosis.Activity.MainActivity;
 import cn.darkal.networkdiagnosis.BR;
-import cn.darkal.networkdiagnosis.Bean.PageBean;
-import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
-import cn.darkal.networkdiagnosis.Fragment.PreviewFragment;
+import cn.darkal.networkdiagnosis.bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.R;
-import cn.darkal.networkdiagnosis.SysApplication;
-import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 
 /**
  * Created by Darkal on 2016/9/5.

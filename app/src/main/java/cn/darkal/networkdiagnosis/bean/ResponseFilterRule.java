@@ -1,8 +1,8 @@
-package cn.darkal.networkdiagnosis.Bean;
+package cn.darkal.networkdiagnosis.bean;
 
 import java.io.Serializable;
 
-import static cn.darkal.networkdiagnosis.Bean.ResponseFilterRule.RULE_TYPE.STRING_REPLACE;
+import static cn.darkal.networkdiagnosis.bean.ResponseFilterRule.RULE_TYPE.STRING_REPLACE;
 
 /**
  * Created by darkal on 2017/5/31.

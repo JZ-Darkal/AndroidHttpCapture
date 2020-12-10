@@ -14,15 +14,13 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.darkal.networkdiagnosis.Adapter.ContentFilterAdapter;
-import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
+import cn.darkal.networkdiagnosis.bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.R;
 import cn.darkal.networkdiagnosis.SysApplication;
-import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 
 public class ChangeFilterActivity extends AppCompatActivity {

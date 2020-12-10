@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import cn.darkal.networkdiagnosis.Bean.ResponseFilterRule;
+import cn.darkal.networkdiagnosis.bean.ResponseFilterRule;
 import cn.darkal.networkdiagnosis.Utils.DeviceUtils;
 import cn.darkal.networkdiagnosis.Utils.SharedPreferenceUtils;
 

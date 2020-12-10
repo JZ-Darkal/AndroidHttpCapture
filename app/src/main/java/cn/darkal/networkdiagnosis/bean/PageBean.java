@@ -1,4 +1,4 @@
-package cn.darkal.networkdiagnosis.Bean;
+package cn.darkal.networkdiagnosis.bean;
 
 /**
  * Created by xuzhou on 2016/9/5.

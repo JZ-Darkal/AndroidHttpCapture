@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 
 import java.util.List;
 
-import cn.darkal.networkdiagnosis.Bean.PageBean;
+import cn.darkal.networkdiagnosis.bean.PageBean;
 import cn.darkal.networkdiagnosis.BR;
 import cn.darkal.networkdiagnosis.R;
 

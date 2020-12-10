@@ -34,6 +34,6 @@
   <item type="id" name="gridview" />
   <item type="id" name="webview" />
   
-  <item type="id" name="about_version_code">false</item>
-  <item type="id" name="split">false</item>
+  <item type="id" name="about_version_code"/>
+  <item type="id" name="split"/>
 </resources>

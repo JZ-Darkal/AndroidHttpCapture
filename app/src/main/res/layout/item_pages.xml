@@ -4,7 +4,7 @@
     <data>
         <variable
             name="pages"
-            type="cn.darkal.networkdiagnosis.Bean.PageBean" />
+            type="cn.darkal.networkdiagnosis.bean.PageBean" />
     </data>
 
     <FrameLayout
