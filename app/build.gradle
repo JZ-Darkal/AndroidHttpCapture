@@ -26,7 +26,7 @@ android {
     defaultConfig {
         applicationId "cn.darkal.networkdiagnosis"
         minSdkVersion 14
-        targetSdkVersion 30
+        targetSdkVersion 27
         versionCode 31
         versionName "3.2.31"
         // Enabling multidex support.
