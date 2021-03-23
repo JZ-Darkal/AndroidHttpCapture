@@ -11,6 +11,7 @@
 1． HTTP/HTTPS抓包<br>
 当用户通过AndroidHttpCapture访问页面的时候，所有的http请求都会被记录下来，然后这些请求包可以预览、分享、上传（上传接口的网址需自行在MainActivity修改）。<br>
 #### 第一次进入程序需要安装CA证书以便进行HTTPS抓包（原理同fiddler，MITM中间人）不安装证书的话无法抓取HTTPS的请求<br>
+#### 高版本的Android不允许跳转设置安装证书，需要自行在设置->安全和锁屏->加密与凭据->安装证书（证书位置：/har/littleproxy-mitm.pem）<br>
 预览页面可以查看从APP启动起所有网络请求数据，实现了按分页过滤、URL搜索功能，并可清空所有数据包<br>
 预览的内容包括Request Header、Request Cookie、Request Content、Response Header、Response Cookie、Response Content<br>
 Content内容如果为JSON将会自动格式化显示<br>
