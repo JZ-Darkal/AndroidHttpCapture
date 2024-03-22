@@ -1,4 +1,4 @@
-## AndroidHttpCapture网络诊断工具      [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://travis-ci.org/JZ-Darkal/AndroidHttpCapture)<br>
+## AndroidHttpCapture网络诊断工具      <br>
 是一款针对于移动流量劫持而开发的手机抓包软件，可以当作是Android版的‘Fiddler’<br>
 主要功能包括：手机端抓包、PING/DNS/TraceRoute诊断、抓包HAR数据上传分享<br>
 使用前请确保手机HTTP代理的关闭<br><br>
